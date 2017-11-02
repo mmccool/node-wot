@@ -1,3 +1,4 @@
+#!/usr/bin/env node
  // OCF TD Generator
  //
  // Run on same device where an iot-rest-api-server is running
@@ -11,18 +12,6 @@
  // on how to set up a suitable test system.  Note that you don't need
  // the gateway.js script, you just want to run the iot-rest-api-server,
  // which can be found here: https://github.com/01org/iot-rest-api-server/
- 
-// Options
-
-// How often to scan OCF metadata and update TDs. 
-var scan_period = 10*1000;  // milliseconds
-
-// How often to scan OCF descriptions and update description database
-var scan_descs_period = 60*1000;  // milliseconds
-
-// How long until TDs expire in Thing Directory.
-//   needs to be larger than scan_period, of course.
-var td_timeout = 15000; // milliseconds
 
 // Output uses util.debuglog, so NODE_DEBUG needs to include
 // one of the following keys for results to show up.
@@ -32,21 +21,56 @@ var info_log = util_q.debuglog('wot-ocf-gen-info');
 var debug_log = util_q.debuglog('wot-ocf-gen-debug');
 var verbose_log = util_q.debuglog('wot-ocf-gen-verbose');
 var silly_log = util_q.debuglog('wot-ocf-gen-silly');
+ 
+// Options
+var cmdr = require("commander");
+cmdr
+.option('-s, --scan-period <scan_period>','OCF resource scan period in ms')
+.option('-d, --desc-period <desc_period>','OCF descriptions scan period in ms')
+.option('-e, --extra-period <extra_period>','TD extra time-to-live')
+.option('-o, --ocf-host <ocf-host>','OCF iot-rest-api-server base url')
+.option('-t, --td-host <td-host>','Thing Directory base url')
+.option('-m, --metadata <metadata path>','path to aux metdata file')
+.option('-p, --port <server port>','port to serve TDs on')
+.parse(process.argv);
+
+// How often to scan OCF metadata and update TDs. 
+var scan_period = 10*1000;  // milliseconds
+if (cmdr.scanPeriod) scan_period = cmdr.scanPeriod;
+
+// How often to scan OCF descriptions and update description database
+var scan_descs_period = 60*1000;  // milliseconds
+if (cmdr.descPeriod) scan_descs_period = cmdr.descPeriod;
+
+// How long until TDs expire in Thing Directory.
+//   needs to be larger than scan_period, of course.
+var extra_period = 5000;  // milliseconds
+if (cmdr.extraPeriod) extra_period = cmdr.extraPeriod;
+var td_period = scan_period + extra_period; // milliseconds
 
 // Where to find iot-rest-api-server
-//    a GET on http(s)://<ocf_host>:<ocf_port>/api/oic/res
+//    a GET on <ocf_host>/api/oic/res
 //    should return OCF resources
-const ocf_host = "gateway.mmccool.net";
-const ocf_port = 8000; 
-const ocf_protocol = "https"; // or https or http, depending
-const ocf_base = ocf_protocol + '://' + ocf_host + ':' + ocf_port + '/api';
+var ocf_host = "https://gateway.mmccool.net:8000";
+if (cmdr.ocfHost) ocf_host = cmdr.ocfHost;
+const ocf_base = ocf_host + '/api';
+
+// Where to find thing-directory server
+var td_host = "https://gateway.mmccool.net:8090";
+if (cmdr.tdHost) td_host = cmdr.tdHost;
+const td_base = td_host;
 
 // Always serves TD on localhost
-//   a GET on http://<td_host>:<td_port>/ 
-//   (a) initiate a rescan and retranslate (b) will return the TD
+//   a GET on http://<self_hostname>:<self_port> 
+//   will return an array of the current TDs
 // NOTE: currently only HTTP supported
-const td_host = "localhost";
-const td_port = 8091;  // port to make TD available on
+const self_hostname = "localhost";
+var self_port = 8091;  // port to make TDs available on
+if (cmdr.selfPort) self_port = cmdr.selfPort;
+
+// Aux metadata path
+var aux_metadata_path = "./metadata.json";
+if (cmdr.metadat) aux_metadata_path = cmdr.metadata;
 
 // Dependencies
 const request = require("request");
@@ -124,9 +148,7 @@ ocf_found_rt = [];
 // return array with one entry per device ID, and with OCF-specific
 // resources stripped out.  Async function, calls done_callback when complete. 
 function get_ocf_metadata(
-    ocf_protocol, // http or https
-    ocf_host,     // hostname (or IP) of OCF iot-rest-api-server
-    ocf_port,     // port used by iot-rest-api-server
+    ocf_host,     // base URL of OCF iot-rest-api-server
     done_callback // call when done
 ) {
     const res_url = ocf_base + '/oic/res';
@@ -208,7 +230,7 @@ function get_ocf_metadata(
 
 // Read Auxiliary metadatabase (stored as JSON-with-comments)
 const shush = require("shush");
-const aux_metadata = shush("metadata.json");
+const aux_metadata = shush(aux_metadata_path);
 verbose_log("Aux metadata: ",json_pp(aux_metadata));
 
 // Used at plugfest...
@@ -305,8 +327,8 @@ function generate_tds(ocf_metadata,done_callback) {
 
 // Construct TD database from OCF metadata, store in variable 
 // also call done_callback with copy of updated database
-function construct_TDs(ocf_protocol,ocf_host,ocf_port,done_callback) {
-    get_ocf_metadata(ocf_protocol,ocf_host,ocf_port,
+function construct_TDs(ocf_host,done_callback) {
+    get_ocf_metadata(ocf_host,
         function(ocf_metadata) {
             generate_tds(ocf_metadata,
                 function(tds) {
@@ -321,7 +343,7 @@ function construct_TDs(ocf_protocol,ocf_host,ocf_port,done_callback) {
 // TODO: this should also send updates to the Thing Directory
 let TDs = [];
 function scan_TDs() {
-    construct_TDs(ocf_protocol,ocf_host,ocf_port,
+    construct_TDs(ocf_host,
         function(tds) {
           TDs = tds;
           basic_log("Scan complete; TD database updated");
@@ -339,10 +361,10 @@ scan_TDs();
 const http = require('http');
 basic_log("OCF Thing Description Metadata Bridge");
 
-const td_url = 'http://' + td_host + ':' + td_port + '/';
+const self_url = 'http://' + self_hostname + ':' + self_port + '/';
 
 const server = http.createServer(function(req,res) {
-    basic_log("TD request received at",td_url);
+    basic_log("TD request received at",self_url);
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/ld+json');
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -351,8 +373,8 @@ const server = http.createServer(function(req,res) {
     res.end(JSON.stringify(TDs));
 });
 
-server.listen(td_port,td_host,function() {
-    basic_log('http server running at ',td_url);
+server.listen(self_port,self_hostname,function() {
+    basic_log('http server running at ',self_url);
 });
 
 

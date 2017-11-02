@@ -6,11 +6,14 @@
   "main": "ocf-gen.js",
   "author": "Michael McCool (michael.mccool@intel.com)",
   "license": "NONE - Not Yet Licensed for External Use",
-  "main": "ocf-gen.js",
   "scripts": {
     "start": "node ocf-gen.js"
   },
+  "bin": {
+    "ocf-gen": "./ocf-gen.js"
+  },
   "dependencies": {
+    "commander": "^2.11.0",
     "http": "0.0.0",
     "ip": "^1.1.5",
     "request": "^2.81.0",
