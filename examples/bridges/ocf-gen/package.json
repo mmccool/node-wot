@@ -1,0 +1,15 @@
+{
+  "name": "ocf-td-gen",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Generate Web of Things TD from OCF Resources",
+  "main": "ocf-gen.js",
+  "author": "Michael McCool (michael.mccool@intel.com)",
+  "license": "W3C",
+  "dependencies": {
+    "http": "0.0.0",
+    "ip": "^1.1.5",
+    "request": "^2.81.0",
+    "shush": "^1.0.0"
+  }
+}
