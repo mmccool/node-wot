@@ -70,9 +70,6 @@ function concatMaps(A,B) {
   return C;
 }
 
-// Read metadatabase (stored as JSON-with-comments)
-const shush = require("shush");
-const metadata = shush("metadata.json");
 
 // Get current host IP (Use for local links...)
 const ip = require("ip"); // not used yet
@@ -209,22 +206,10 @@ function get_ocf_metadata(
    });
 }
 
-// Read Auxiliary metadatabase
-// for each rt, list some extra, "inferred" data to include
-// TODO: read this from an external JSON file/database
-let aux_metadata = {
-   "oic.r.led": {
-       "@type": ["iot:Light","iot:BinarySwitch"],
-       "interaction": {
-           "name": "LED State",
-           "@type": ["iot:SwitchStatus"],
-           "outputdata": {
-              "@type": ["iot:SwitchData"],
-              "type": "boolean"
-           },
-       }
-   }
-};
+// Read Auxiliary metadatabase (stored as JSON-with-comments)
+const shush = require("shush");
+const aux_metadata = shush("metadata.json");
+verbose_log("Aux metadata: ",json_pp(aux_metadata));
 
 // Used at plugfest...
 // name_prefix = "";
@@ -252,26 +237,30 @@ function generate_tds(ocf_metadata,done_callback) {
                "name": name_prefix + ocf_metadata[di].name,
                "interaction": []
           };
-          // convert OCF links to WoT properties
+          // convert OCF links to WoT interactions
+          let jj = 0;
           for (let j=0; j < links.length; j++) { 
               let link = links[j];
               let href = link.href;
               let rt = link.rt;
-              // Figure out name for property
+              // Check if aux metadata exists
               let aux = undefined;
               if (undefined !== link.rt) {
                   aux = aux_metadata[link.rt];
               }
+              // Figure out name for resource
               let name;
               if (aux) {
-                  name = aux.interaction.name;
+                  // use aux metaname name if possible
+                  name = aux.interaction[0].name;
               } else {
+                  // otherwise use last segment of path
                   name = link.href.split("/")[-1];
               }
-              // Set up basic header
+              // Set up basic header for this interaction
               let interaction = {
                   "name": name,
-                  "@type": ["Property"],
+                  "@type": [],
                   "link": [
                       {
                           "href": prop_base + link.href
@@ -280,24 +269,31 @@ function generate_tds(ocf_metadata,done_callback) {
                       }
                   ]
               };
+              // Handle first "Property" interaction for each resource
               if (aux) {
                   // add inputdata protocol binding, if any
-                  if (aux.interaction.inputdata) {
-                      interaction.inputdata = aux.interaction.inputdata;
+                  if (aux.interaction[0].inputdata) {
+                      interaction.inputdata = aux.interaction[0].inputdata;
                   }
                   // add outputdata protocol binding, if any
                   if (aux.interaction.outputdata) {
-                      interaction.outputdata = aux.interaction.outputdata;
+                      interaction.outputdata = aux.interaction[0].outputdata;
                   }
                   // add extra semantic tags for interaction (if any)
                   interaction["@type"] = 
-                      interaction["@type"].concat(aux.interaction["@type"]);
+                      interaction["@type"].concat(aux.interaction[0]["@type"]);
                   // add extra semantic tags for entire thing (if any)
                   td["@type"] = 
                       td["@type"].concat(aux["@type"]);
               }
-              // append WoT interaction for this OCF resource
-              td.interaction[j] = interaction;
+              // append WoT "Property" interaction for this OCF resource
+              td.interaction[jj++] = interaction;
+              // append any additional interactions (eg Actions, Events)
+              if (aux) {
+                 for (let k=1; k < aux.interaction.length; k++) {
+                     td.interaction[jj++] = aux.interaction[k];
+                 }
+              }
           }
           // TODO: remove duplicate global semantic tags
           tds[i] = td;

@@ -9,74 +9,15 @@
         ],
         "@type": [
             "Thing",
-            "iot:Light",
             "iot:BinarySwitch"
         ],
-        "name": "Intel-OCF-Smart Home LED (1red)",
+        "name": "Intel-OCF-Smart Home Motion (1)",
         "interaction": [
             {
-                "name": "LED State",
+                "name": "Switch State",
                 "@type": [
                     "Property",
                     "iot:SwitchStatus"
-                ],
-                "link": [
-                    {
-                        "href": "https://gateway.mmccool.net:8000/api/oic/a/led1red?di=8c2c6907-ed4a-4527-8f23-57df6999b8aa",
-                        "mediatype": "application/json"
-                    }
-                ],
-                "outputdata": {
-                    "@type": [
-                        "iot:SwitchData"
-                    ],
-                    "type": "boolean"
-                }
-            }
-        ]
-    },
-    {
-        "@context": [
-            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
-            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
-            {
-                "iot": "http://iotschema.org/"
-            }
-        ],
-        "@type": [
-            "Thing"
-        ],
-        "name": "Intel-OCF-598859c7-afd6-4bc9-a7ec-7f4c6e74454d",
-        "interaction": [
-            {
-                "@type": [
-                    "Property"
-                ],
-                "link": [
-                    {
-                        "href": "https://gateway.mmccool.net:8000/api/oic/a/temperature1?di=598859c7-afd6-4bc9-a7ec-7f4c6e74454d",
-                        "mediatype": "application/json"
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "@context": [
-            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
-            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
-            {
-                "iot": "http://iotschema.org/"
-            }
-        ],
-        "@type": [
-            "Thing"
-        ],
-        "name": "Intel-OCF-5dc3f14e-4976-44d4-bfe8-57838db97ab5",
-        "interaction": [
-            {
-                "@type": [
-                    "Property"
                 ],
                 "link": [
                     {
@@ -96,313 +37,16 @@
             }
         ],
         "@type": [
-            "Thing"
-        ],
-        "name": "Intel-OCF-f057c263-58db-4cb1-9470-bba9344e1ba8",
-        "interaction": [
-            {
-                "@type": [
-                    "Property"
-                ],
-                "link": [
-                    {
-                        "href": "https://gateway.mmccool.net:8000/api/oic/a/toggle1?di=f057c263-58db-4cb1-9470-bba9344e1ba8",
-                        "mediatype": "application/json"
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "@context": [
-            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
-            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
-            {
-                "iot": "http://iotschema.org/"
-            }
-        ],
-        "@type": [
             "Thing",
-            "iot:Light",
-            "iot:BinarySwitch"
+            "iot:Temperature"
         ],
-        "name": "Intel-OCF-5081db06-f405-4ecf-bcdd-2424bf5af1ca",
+        "name": "Intel-OCF-f2305852-4f82-47ce-871d-a0af237932c1",
         "interaction": [
             {
-                "name": "LED State",
+                "name": "Temperature",
                 "@type": [
                     "Property",
-                    "iot:SwitchStatus"
-                ],
-                "link": [
-                    {
-                        "href": "https://gateway.mmccool.net:8000/api/oic/a/led1relay?di=5081db06-f405-4ecf-bcdd-2424bf5af1ca",
-                        "mediatype": "application/json"
-                    }
-                ],
-                "outputdata": {
-                    "@type": [
-                        "iot:SwitchData"
-                    ],
-                    "type": "boolean"
-                }
-            }
-        ]
-    },
-    {
-        "@context": [
-            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
-            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
-            {
-                "iot": "http://iotschema.org/"
-            }
-        ],
-        "@type": [
-            "Thing"
-        ],
-        "name": "Intel-OCF-3932ae08-31b4-4882-b299-5d488ec8775c",
-        "interaction": [
-            {
-                "@type": [
-                    "Property"
-                ],
-                "link": [
-                    {
-                        "href": "https://gateway.mmccool.net:8000/api/oic/a/button1touch?di=3932ae08-31b4-4882-b299-5d488ec8775c",
-                        "mediatype": "application/json"
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "@context": [
-            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
-            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
-            {
-                "iot": "http://iotschema.org/"
-            }
-        ],
-        "@type": [
-            "Thing",
-            "iot:Light",
-            "iot:BinarySwitch"
-        ],
-        "name": "Intel-OCF-Smart Home LED (1mosfet)",
-        "interaction": [
-            {
-                "name": "LED State",
-                "@type": [
-                    "Property",
-                    "iot:SwitchStatus"
-                ],
-                "link": [
-                    {
-                        "href": "https://gateway.mmccool.net:8000/api/oic/a/led1mosfet?di=336db92b-45f6-496b-997c-e196ba7b49fd",
-                        "mediatype": "application/json"
-                    }
-                ],
-                "outputdata": {
-                    "@type": [
-                        "iot:SwitchData"
-                    ],
-                    "type": "boolean"
-                }
-            }
-        ]
-    },
-    {
-        "@context": [
-            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
-            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
-            {
-                "iot": "http://iotschema.org/"
-            }
-        ],
-        "@type": [
-            "Thing"
-        ],
-        "name": "Intel-OCF-Smart Home RGB LED (1)",
-        "interaction": [
-            {
-                "@type": [
-                    "Property"
-                ],
-                "link": [
-                    {
-                        "href": "https://gateway.mmccool.net:8000/api/oic/a/rgbled1?di=6a0f7806-335e-4c84-a4a4-c223a62ef754",
-                        "mediatype": "application/json"
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "@context": [
-            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
-            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
-            {
-                "iot": "http://iotschema.org/"
-            }
-        ],
-        "@type": [
-            "Thing",
-            "iot:Light",
-            "iot:BinarySwitch"
-        ],
-        "name": "Intel-OCF-Smart Home LED (0mosfet)",
-        "interaction": [
-            {
-                "name": "LED State",
-                "@type": [
-                    "Property",
-                    "iot:SwitchStatus"
-                ],
-                "link": [
-                    {
-                        "href": "https://gateway.mmccool.net:8000/api/oic/a/led0mosfet?di=ea16d184-95ad-4af7-bfc9-53e86f55f3a4",
-                        "mediatype": "application/json"
-                    }
-                ],
-                "outputdata": {
-                    "@type": [
-                        "iot:SwitchData"
-                    ],
-                    "type": "boolean"
-                }
-            }
-        ]
-    },
-    {
-        "@context": [
-            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
-            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
-            {
-                "iot": "http://iotschema.org/"
-            }
-        ],
-        "@type": [
-            "Thing"
-        ],
-        "name": "Intel-OCF-Smart Home Toggle (0)",
-        "interaction": [
-            {
-                "@type": [
-                    "Property"
-                ],
-                "link": [
-                    {
-                        "href": "https://gateway.mmccool.net:8000/api/oic/a/toggle0?di=4b74842c-8bfe-4f14-8bc5-31b4c79658a4",
-                        "mediatype": "application/json"
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "@context": [
-            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
-            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
-            {
-                "iot": "http://iotschema.org/"
-            }
-        ],
-        "@type": [
-            "Thing",
-            "iot:Light",
-            "iot:BinarySwitch"
-        ],
-        "name": "Intel-OCF-Smart Home LED (0green)",
-        "interaction": [
-            {
-                "name": "LED State",
-                "@type": [
-                    "Property",
-                    "iot:SwitchStatus"
-                ],
-                "link": [
-                    {
-                        "href": "https://gateway.mmccool.net:8000/api/oic/a/led0green?di=6573313c-da1e-4068-beb1-884b0c4c3c5d",
-                        "mediatype": "application/json"
-                    }
-                ],
-                "outputdata": {
-                    "@type": [
-                        "iot:SwitchData"
-                    ],
-                    "type": "boolean"
-                }
-            }
-        ]
-    },
-    {
-        "@context": [
-            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
-            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
-            {
-                "iot": "http://iotschema.org/"
-            }
-        ],
-        "@type": [
-            "Thing"
-        ],
-        "name": "Intel-OCF-Smart Home Motion (0)",
-        "interaction": [
-            {
-                "@type": [
-                    "Property"
-                ],
-                "link": [
-                    {
-                        "href": "https://gateway.mmccool.net:8000/api/oic/a/motion0?di=0800f07a-178d-48ec-9ddf-d8a941071298",
-                        "mediatype": "application/json"
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "@context": [
-            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
-            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
-            {
-                "iot": "http://iotschema.org/"
-            }
-        ],
-        "@type": [
-            "Thing"
-        ],
-        "name": "Intel-OCF-Smart Home Illuminance (0)",
-        "interaction": [
-            {
-                "@type": [
-                    "Property"
-                ],
-                "link": [
-                    {
-                        "href": "https://gateway.mmccool.net:8000/api/oic/a/illuminance0?di=3255959d-741c-4b2b-81c2-42a4caa2223e",
-                        "mediatype": "application/json"
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "@context": [
-            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
-            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
-            {
-                "iot": "http://iotschema.org/"
-            }
-        ],
-        "@type": [
-            "Thing"
-        ],
-        "name": "Intel-OCF-Smart Home Temperature (0)",
-        "interaction": [
-            {
-                "@type": [
-                    "Property"
+                    "iot:TemperatureStatus"
                 ],
                 "link": [
                     {
@@ -426,25 +70,47 @@
             "iot:Light",
             "iot:BinarySwitch"
         ],
-        "name": "Intel-OCF-Smart Home LED (0red)",
+        "name": "Intel-OCF-397a9167-88bc-4b52-844a-dade5b772c30",
         "interaction": [
             {
-                "name": "LED State",
+                "name": "Switch State",
                 "@type": [
                     "Property",
                     "iot:SwitchStatus"
                 ],
                 "link": [
                     {
-                        "href": "https://gateway.mmccool.net:8000/api/oic/a/led0red?di=c331fb1b-8568-48be-9033-4aaaa95bf2cf",
+                        "href": "https://gateway.mmccool.net:8000/api/oic/a/led0blue?di=397a9167-88bc-4b52-844a-dade5b772c30",
                         "mediatype": "application/json"
                     }
+                ]
+            },
+            {
+                "name": "Switch On",
+                "@type": [
+                    "Action",
+                    "iot:SwitchOn"
                 ],
                 "outputdata": {
                     "@type": [
                         "iot:SwitchData"
                     ],
-                    "type": "boolean"
+                    "type": "boolean",
+                    "value": true
+                }
+            },
+            {
+                "name": "Switch Off",
+                "@type": [
+                    "Action",
+                    "iot:SwitchOff"
+                ],
+                "outputdata": {
+                    "@type": [
+                        "iot:SwitchData"
+                    ],
+                    "type": "boolean",
+                    "value": false
                 }
             }
         ]
@@ -462,25 +128,47 @@
             "iot:Light",
             "iot:BinarySwitch"
         ],
-        "name": "Intel-OCF-Smart Home LED (0blue)",
+        "name": "Intel-OCF-6573313c-da1e-4068-beb1-884b0c4c3c5d",
         "interaction": [
             {
-                "name": "LED State",
+                "name": "Switch State",
                 "@type": [
                     "Property",
                     "iot:SwitchStatus"
                 ],
                 "link": [
                     {
-                        "href": "https://gateway.mmccool.net:8000/api/oic/a/led0blue?di=397a9167-88bc-4b52-844a-dade5b772c30",
+                        "href": "https://gateway.mmccool.net:8000/api/oic/a/led0green?di=6573313c-da1e-4068-beb1-884b0c4c3c5d",
                         "mediatype": "application/json"
                     }
+                ]
+            },
+            {
+                "name": "Switch On",
+                "@type": [
+                    "Action",
+                    "iot:SwitchOn"
                 ],
                 "outputdata": {
                     "@type": [
                         "iot:SwitchData"
                     ],
-                    "type": "boolean"
+                    "type": "boolean",
+                    "value": true
+                }
+            },
+            {
+                "name": "Switch Off",
+                "@type": [
+                    "Action",
+                    "iot:SwitchOff"
+                ],
+                "outputdata": {
+                    "@type": [
+                        "iot:SwitchData"
+                    ],
+                    "type": "boolean",
+                    "value": false
                 }
             }
         ]
@@ -494,17 +182,20 @@
             }
         ],
         "@type": [
-            "Thing"
+            "Thing",
+            "iot:Illuminance"
         ],
-        "name": "Intel-OCF-Smart Home Buzzer (0)",
+        "name": "Intel-OCF-3255959d-741c-4b2b-81c2-42a4caa2223e",
         "interaction": [
             {
+                "name": "Illuminance",
                 "@type": [
-                    "Property"
+                    "Property",
+                    "iot:IlluminanceStatus"
                 ],
                 "link": [
                     {
-                        "href": "https://gateway.mmccool.net:8000/api/oic/a/buzzer0?di=893e9dbb-a298-4123-a041-80f386115958",
+                        "href": "https://gateway.mmccool.net:8000/api/oic/a/illuminance0?di=3255959d-741c-4b2b-81c2-42a4caa2223e",
                         "mediatype": "application/json"
                     }
                 ]
@@ -524,25 +215,221 @@
             "iot:Light",
             "iot:BinarySwitch"
         ],
-        "name": "Intel-OCF-79683ab5-8df1-4b7a-b110-c1b8fe251e7d",
+        "name": "Intel-OCF-c331fb1b-8568-48be-9033-4aaaa95bf2cf",
         "interaction": [
             {
-                "name": "LED State",
+                "name": "Switch State",
                 "@type": [
                     "Property",
                     "iot:SwitchStatus"
                 ],
                 "link": [
                     {
-                        "href": "https://gateway.mmccool.net:8000/api/oic/a/led2relay?di=79683ab5-8df1-4b7a-b110-c1b8fe251e7d",
+                        "href": "https://gateway.mmccool.net:8000/api/oic/a/led0red?di=c331fb1b-8568-48be-9033-4aaaa95bf2cf",
                         "mediatype": "application/json"
                     }
+                ]
+            },
+            {
+                "name": "Switch On",
+                "@type": [
+                    "Action",
+                    "iot:SwitchOn"
                 ],
                 "outputdata": {
                     "@type": [
                         "iot:SwitchData"
                     ],
-                    "type": "boolean"
+                    "type": "boolean",
+                    "value": true
+                }
+            },
+            {
+                "name": "Switch Off",
+                "@type": [
+                    "Action",
+                    "iot:SwitchOff"
+                ],
+                "outputdata": {
+                    "@type": [
+                        "iot:SwitchData"
+                    ],
+                    "type": "boolean",
+                    "value": false
+                }
+            }
+        ]
+    },
+    {
+        "@context": [
+            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
+            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
+            {
+                "iot": "http://iotschema.org/"
+            }
+        ],
+        "@type": [
+            "Thing",
+            "iot:BinarySwitch"
+        ],
+        "name": "Intel-OCF-0800f07a-178d-48ec-9ddf-d8a941071298",
+        "interaction": [
+            {
+                "name": "Switch State",
+                "@type": [
+                    "Property",
+                    "iot:SwitchStatus"
+                ],
+                "link": [
+                    {
+                        "href": "https://gateway.mmccool.net:8000/api/oic/a/motion0?di=0800f07a-178d-48ec-9ddf-d8a941071298",
+                        "mediatype": "application/json"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "@context": [
+            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
+            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
+            {
+                "iot": "http://iotschema.org/"
+            }
+        ],
+        "@type": [
+            "Thing",
+            "iot:BinarySwitch"
+        ],
+        "name": "Intel-OCF-4b74842c-8bfe-4f14-8bc5-31b4c79658a4",
+        "interaction": [
+            {
+                "name": "Switch State",
+                "@type": [
+                    "Property",
+                    "iot:SwitchStatus"
+                ],
+                "link": [
+                    {
+                        "href": "https://gateway.mmccool.net:8000/api/oic/a/toggle0?di=4b74842c-8bfe-4f14-8bc5-31b4c79658a4",
+                        "mediatype": "application/json"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "@context": [
+            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
+            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
+            {
+                "iot": "http://iotschema.org/"
+            }
+        ],
+        "@type": [
+            "Thing",
+            "iot:BinarySwitch"
+        ],
+        "name": "Intel-OCF-Smart Home Button (1touch)",
+        "interaction": [
+            {
+                "name": "Switch State",
+                "@type": [
+                    "Property",
+                    "iot:SwitchStatus"
+                ],
+                "link": [
+                    {
+                        "href": "https://gateway.mmccool.net:8000/api/oic/a/button1touch?di=3932ae08-31b4-4882-b299-5d488ec8775c",
+                        "mediatype": "application/json"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "@context": [
+            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
+            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
+            {
+                "iot": "http://iotschema.org/"
+            }
+        ],
+        "@type": [
+            "Thing",
+            "iot:BinarySwitch"
+        ],
+        "name": "Intel-OCF-Smart Home Toggle (1)",
+        "interaction": [
+            {
+                "name": "Switch State",
+                "@type": [
+                    "Property",
+                    "iot:SwitchStatus"
+                ],
+                "link": [
+                    {
+                        "href": "https://gateway.mmccool.net:8000/api/oic/a/toggle1?di=f057c263-58db-4cb1-9470-bba9344e1ba8",
+                        "mediatype": "application/json"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "@context": [
+            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
+            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
+            {
+                "iot": "http://iotschema.org/"
+            }
+        ],
+        "@type": [
+            "Thing",
+            "iot:Light",
+            "iot:BinarySwitch"
+        ],
+        "name": "Intel-OCF-Smart Home LED (1relay)",
+        "interaction": [
+            {
+                "name": "Switch State",
+                "@type": [
+                    "Property",
+                    "iot:SwitchStatus"
+                ],
+                "link": [
+                    {
+                        "href": "https://gateway.mmccool.net:8000/api/oic/a/led1relay?di=5081db06-f405-4ecf-bcdd-2424bf5af1ca",
+                        "mediatype": "application/json"
+                    }
+                ]
+            },
+            {
+                "name": "Switch On",
+                "@type": [
+                    "Action",
+                    "iot:SwitchOn"
+                ],
+                "outputdata": {
+                    "@type": [
+                        "iot:SwitchData"
+                    ],
+                    "type": "boolean",
+                    "value": true
+                }
+            },
+            {
+                "name": "Switch Off",
+                "@type": [
+                    "Action",
+                    "iot:SwitchOff"
+                ],
+                "outputdata": {
+                    "@type": [
+                        "iot:SwitchData"
+                    ],
+                    "type": "boolean",
+                    "value": false
                 }
             }
         ]
@@ -560,25 +447,105 @@
             "iot:Light",
             "iot:BinarySwitch"
         ],
-        "name": "Intel-OCF-3ee85e44-7a56-4f0e-a8b8-b250c868e513",
+        "name": "Intel-OCF-Smart Home LED (1red)",
         "interaction": [
             {
-                "name": "LED State",
+                "name": "Switch State",
                 "@type": [
                     "Property",
                     "iot:SwitchStatus"
                 ],
                 "link": [
                     {
-                        "href": "https://gateway.mmccool.net:8000/api/oic/a/led2mosfet?di=3ee85e44-7a56-4f0e-a8b8-b250c868e513",
+                        "href": "https://gateway.mmccool.net:8000/api/oic/a/led1red?di=8c2c6907-ed4a-4527-8f23-57df6999b8aa",
                         "mediatype": "application/json"
                     }
+                ]
+            },
+            {
+                "name": "Switch On",
+                "@type": [
+                    "Action",
+                    "iot:SwitchOn"
                 ],
                 "outputdata": {
                     "@type": [
                         "iot:SwitchData"
                     ],
-                    "type": "boolean"
+                    "type": "boolean",
+                    "value": true
+                }
+            },
+            {
+                "name": "Switch Off",
+                "@type": [
+                    "Action",
+                    "iot:SwitchOff"
+                ],
+                "outputdata": {
+                    "@type": [
+                        "iot:SwitchData"
+                    ],
+                    "type": "boolean",
+                    "value": false
+                }
+            }
+        ]
+    },
+    {
+        "@context": [
+            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
+            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
+            {
+                "iot": "http://iotschema.org/"
+            }
+        ],
+        "@type": [
+            "Thing",
+            "iot:Light",
+            "iot:BinarySwitch"
+        ],
+        "name": "Intel-OCF-ea16d184-95ad-4af7-bfc9-53e86f55f3a4",
+        "interaction": [
+            {
+                "name": "Switch State",
+                "@type": [
+                    "Property",
+                    "iot:SwitchStatus"
+                ],
+                "link": [
+                    {
+                        "href": "https://gateway.mmccool.net:8000/api/oic/a/led0mosfet?di=ea16d184-95ad-4af7-bfc9-53e86f55f3a4",
+                        "mediatype": "application/json"
+                    }
+                ]
+            },
+            {
+                "name": "Switch On",
+                "@type": [
+                    "Action",
+                    "iot:SwitchOn"
+                ],
+                "outputdata": {
+                    "@type": [
+                        "iot:SwitchData"
+                    ],
+                    "type": "boolean",
+                    "value": true
+                }
+            },
+            {
+                "name": "Switch Off",
+                "@type": [
+                    "Action",
+                    "iot:SwitchOff"
+                ],
+                "outputdata": {
+                    "@type": [
+                        "iot:SwitchData"
+                    ],
+                    "type": "boolean",
+                    "value": false
                 }
             }
         ]
@@ -594,15 +561,419 @@
         "@type": [
             "Thing"
         ],
+        "name": "Intel-OCF-Smart Home RGB LED (1)",
+        "interaction": [
+            {
+                "@type": [],
+                "link": [
+                    {
+                        "href": "https://gateway.mmccool.net:8000/api/oic/a/rgbled1?di=6a0f7806-335e-4c84-a4a4-c223a62ef754",
+                        "mediatype": "application/json"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "@context": [
+            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
+            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
+            {
+                "iot": "http://iotschema.org/"
+            }
+        ],
+        "@type": [
+            "Thing",
+            "iot:Light",
+            "iot:BinarySwitch"
+        ],
+        "name": "Intel-OCF-Smart Home LED (2mosfet)",
+        "interaction": [
+            {
+                "name": "Switch State",
+                "@type": [
+                    "Property",
+                    "iot:SwitchStatus"
+                ],
+                "link": [
+                    {
+                        "href": "https://gateway.mmccool.net:8000/api/oic/a/led2mosfet?di=3ee85e44-7a56-4f0e-a8b8-b250c868e513",
+                        "mediatype": "application/json"
+                    }
+                ]
+            },
+            {
+                "name": "Switch On",
+                "@type": [
+                    "Action",
+                    "iot:SwitchOn"
+                ],
+                "outputdata": {
+                    "@type": [
+                        "iot:SwitchData"
+                    ],
+                    "type": "boolean",
+                    "value": true
+                }
+            },
+            {
+                "name": "Switch Off",
+                "@type": [
+                    "Action",
+                    "iot:SwitchOff"
+                ],
+                "outputdata": {
+                    "@type": [
+                        "iot:SwitchData"
+                    ],
+                    "type": "boolean",
+                    "value": false
+                }
+            }
+        ]
+    },
+    {
+        "@context": [
+            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
+            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
+            {
+                "iot": "http://iotschema.org/"
+            }
+        ],
+        "@type": [
+            "Thing",
+            "iot:BinarySwitch"
+        ],
+        "name": "Intel-OCF-Smart Home Motion (2)",
+        "interaction": [
+            {
+                "name": "Switch State",
+                "@type": [
+                    "Property",
+                    "iot:SwitchStatus"
+                ],
+                "link": [
+                    {
+                        "href": "https://gateway.mmccool.net:8000/api/oic/a/motion2?di=c440e5ef-a02f-49cf-b036-00b0738b0d86",
+                        "mediatype": "application/json"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "@context": [
+            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
+            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
+            {
+                "iot": "http://iotschema.org/"
+            }
+        ],
+        "@type": [
+            "Thing",
+            "iot:Temperature"
+        ],
+        "name": "Intel-OCF-Smart Home Temperature (1)",
+        "interaction": [
+            {
+                "name": "Temperature",
+                "@type": [
+                    "Property",
+                    "iot:TemperatureStatus"
+                ],
+                "link": [
+                    {
+                        "href": "https://gateway.mmccool.net:8000/api/oic/a/temperature1?di=598859c7-afd6-4bc9-a7ec-7f4c6e74454d",
+                        "mediatype": "application/json"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "@context": [
+            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
+            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
+            {
+                "iot": "http://iotschema.org/"
+            }
+        ],
+        "@type": [
+            "Thing",
+            "iot:Light",
+            "iot:BinarySwitch"
+        ],
+        "name": "Intel-OCF-Smart Home LED (1mosfet)",
+        "interaction": [
+            {
+                "name": "Switch State",
+                "@type": [
+                    "Property",
+                    "iot:SwitchStatus"
+                ],
+                "link": [
+                    {
+                        "href": "https://gateway.mmccool.net:8000/api/oic/a/led1mosfet?di=336db92b-45f6-496b-997c-e196ba7b49fd",
+                        "mediatype": "application/json"
+                    }
+                ]
+            },
+            {
+                "name": "Switch On",
+                "@type": [
+                    "Action",
+                    "iot:SwitchOn"
+                ],
+                "outputdata": {
+                    "@type": [
+                        "iot:SwitchData"
+                    ],
+                    "type": "boolean",
+                    "value": true
+                }
+            },
+            {
+                "name": "Switch Off",
+                "@type": [
+                    "Action",
+                    "iot:SwitchOff"
+                ],
+                "outputdata": {
+                    "@type": [
+                        "iot:SwitchData"
+                    ],
+                    "type": "boolean",
+                    "value": false
+                }
+            }
+        ]
+    },
+    {
+        "@context": [
+            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
+            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
+            {
+                "iot": "http://iotschema.org/"
+            }
+        ],
+        "@type": [
+            "Thing",
+            "iot:Light",
+            "iot:BinarySwitch"
+        ],
+        "name": "Intel-OCF-594ee957-fd3e-4547-9430-5267bcdb3ed7",
+        "interaction": [
+            {
+                "name": "Switch State",
+                "@type": [
+                    "Property",
+                    "iot:SwitchStatus"
+                ],
+                "link": [
+                    {
+                        "href": "https://gateway.mmccool.net:8000/api/oic/a/led2side?di=594ee957-fd3e-4547-9430-5267bcdb3ed7",
+                        "mediatype": "application/json"
+                    }
+                ]
+            },
+            {
+                "name": "Switch On",
+                "@type": [
+                    "Action",
+                    "iot:SwitchOn"
+                ],
+                "outputdata": {
+                    "@type": [
+                        "iot:SwitchData"
+                    ],
+                    "type": "boolean",
+                    "value": true
+                }
+            },
+            {
+                "name": "Switch Off",
+                "@type": [
+                    "Action",
+                    "iot:SwitchOff"
+                ],
+                "outputdata": {
+                    "@type": [
+                        "iot:SwitchData"
+                    ],
+                    "type": "boolean",
+                    "value": false
+                }
+            }
+        ]
+    },
+    {
+        "@context": [
+            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
+            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
+            {
+                "iot": "http://iotschema.org/"
+            }
+        ],
+        "@type": [
+            "Thing",
+            "iot:Light",
+            "iot:BinarySwitch"
+        ],
+        "name": "Intel-OCF-79683ab5-8df1-4b7a-b110-c1b8fe251e7d",
+        "interaction": [
+            {
+                "name": "Switch State",
+                "@type": [
+                    "Property",
+                    "iot:SwitchStatus"
+                ],
+                "link": [
+                    {
+                        "href": "https://gateway.mmccool.net:8000/api/oic/a/led2relay?di=79683ab5-8df1-4b7a-b110-c1b8fe251e7d",
+                        "mediatype": "application/json"
+                    }
+                ]
+            },
+            {
+                "name": "Switch On",
+                "@type": [
+                    "Action",
+                    "iot:SwitchOn"
+                ],
+                "outputdata": {
+                    "@type": [
+                        "iot:SwitchData"
+                    ],
+                    "type": "boolean",
+                    "value": true
+                }
+            },
+            {
+                "name": "Switch Off",
+                "@type": [
+                    "Action",
+                    "iot:SwitchOff"
+                ],
+                "outputdata": {
+                    "@type": [
+                        "iot:SwitchData"
+                    ],
+                    "type": "boolean",
+                    "value": false
+                }
+            }
+        ]
+    },
+    {
+        "@context": [
+            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
+            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
+            {
+                "iot": "http://iotschema.org/"
+            }
+        ],
+        "@type": [
+            "Thing",
+            "iot:BinarySwitch"
+        ],
         "name": "Intel-OCF-e7678d50-6a14-426b-a1f0-fb1b8ade4cd5",
         "interaction": [
             {
+                "name": "Switch State",
                 "@type": [
-                    "Property"
+                    "Property",
+                    "iot:SwitchStatus"
                 ],
                 "link": [
                     {
                         "href": "https://gateway.mmccool.net:8000/api/oic/a/toggle2?di=e7678d50-6a14-426b-a1f0-fb1b8ade4cd5",
+                        "mediatype": "application/json"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "@context": [
+            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
+            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
+            {
+                "iot": "http://iotschema.org/"
+            }
+        ],
+        "@type": [
+            "Thing",
+            "iot:Temperature"
+        ],
+        "name": "Intel-OCF-e855ad80-c435-4614-a4b7-01d63afc712e",
+        "interaction": [
+            {
+                "name": "Temperature",
+                "@type": [
+                    "Property",
+                    "iot:TemperatureStatus"
+                ],
+                "link": [
+                    {
+                        "href": "https://gateway.mmccool.net:8000/api/oic/a/temperature2?di=e855ad80-c435-4614-a4b7-01d63afc712e",
+                        "mediatype": "application/json"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "@context": [
+            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
+            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
+            {
+                "iot": "http://iotschema.org/"
+            }
+        ],
+        "@type": [
+            "Thing",
+            "iot:BinarySwitch"
+        ],
+        "name": "Intel-OCF-15603e08-5f45-4bd5-b3ef-6a192ae39f76",
+        "interaction": [
+            {
+                "name": "Switch State",
+                "@type": [
+                    "Property",
+                    "iot:SwitchStatus"
+                ],
+                "link": [
+                    {
+                        "href": "https://gateway.mmccool.net:8000/api/oic/a/button2touch?di=15603e08-5f45-4bd5-b3ef-6a192ae39f76",
+                        "mediatype": "application/json"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "@context": [
+            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
+            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
+            {
+                "iot": "http://iotschema.org/"
+            }
+        ],
+        "@type": [
+            "Thing",
+            "iot:Illuminance"
+        ],
+        "name": "Intel-OCF-c75fe336-28d3-4b02-b52c-9a4daa9577f6",
+        "interaction": [
+            {
+                "name": "Illuminance",
+                "@type": [
+                    "Property",
+                    "iot:IlluminanceStatus"
+                ],
+                "link": [
+                    {
+                        "href": "https://gateway.mmccool.net:8000/api/oic/a/illuminance2?di=c75fe336-28d3-4b02-b52c-9a4daa9577f6",
                         "mediatype": "application/json"
                     }
                 ]
@@ -625,7 +996,7 @@
         "name": "Intel-OCF-e6b060cf-dc10-4375-ae08-1f9e2de0aa2b",
         "interaction": [
             {
-                "name": "LED State",
+                "name": "Switch State",
                 "@type": [
                     "Property",
                     "iot:SwitchStatus"
@@ -635,65 +1006,35 @@
                         "href": "https://gateway.mmccool.net:8000/api/oic/a/led2top?di=e6b060cf-dc10-4375-ae08-1f9e2de0aa2b",
                         "mediatype": "application/json"
                     }
+                ]
+            },
+            {
+                "name": "Switch On",
+                "@type": [
+                    "Action",
+                    "iot:SwitchOn"
                 ],
                 "outputdata": {
                     "@type": [
                         "iot:SwitchData"
                     ],
-                    "type": "boolean"
+                    "type": "boolean",
+                    "value": true
                 }
-            }
-        ]
-    },
-    {
-        "@context": [
-            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
-            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
+            },
             {
-                "iot": "http://iotschema.org/"
-            }
-        ],
-        "@type": [
-            "Thing"
-        ],
-        "name": "Intel-OCF-15603e08-5f45-4bd5-b3ef-6a192ae39f76",
-        "interaction": [
-            {
+                "name": "Switch Off",
                 "@type": [
-                    "Property"
+                    "Action",
+                    "iot:SwitchOff"
                 ],
-                "link": [
-                    {
-                        "href": "https://gateway.mmccool.net:8000/api/oic/a/button2touch?di=15603e08-5f45-4bd5-b3ef-6a192ae39f76",
-                        "mediatype": "application/json"
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "@context": [
-            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
-            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
-            {
-                "iot": "http://iotschema.org/"
-            }
-        ],
-        "@type": [
-            "Thing"
-        ],
-        "name": "Intel-OCF-e855ad80-c435-4614-a4b7-01d63afc712e",
-        "interaction": [
-            {
-                "@type": [
-                    "Property"
-                ],
-                "link": [
-                    {
-                        "href": "https://gateway.mmccool.net:8000/api/oic/a/temperature2?di=e855ad80-c435-4614-a4b7-01d63afc712e",
-                        "mediatype": "application/json"
-                    }
-                ]
+                "outputdata": {
+                    "@type": [
+                        "iot:SwitchData"
+                    ],
+                    "type": "boolean",
+                    "value": false
+                }
             }
         ]
     },
@@ -707,81 +1048,50 @@
         ],
         "@type": [
             "Thing",
-            "iot:Light",
             "iot:BinarySwitch"
         ],
-        "name": "Intel-OCF-594ee957-fd3e-4547-9430-5267bcdb3ed7",
+        "name": "Intel-OCF-893e9dbb-a298-4123-a041-80f386115958",
         "interaction": [
             {
-                "name": "LED State",
+                "name": "Switch State",
                 "@type": [
                     "Property",
                     "iot:SwitchStatus"
                 ],
                 "link": [
                     {
-                        "href": "https://gateway.mmccool.net:8000/api/oic/a/led2side?di=594ee957-fd3e-4547-9430-5267bcdb3ed7",
+                        "href": "https://gateway.mmccool.net:8000/api/oic/a/buzzer0?di=893e9dbb-a298-4123-a041-80f386115958",
                         "mediatype": "application/json"
                     }
+                ]
+            },
+            {
+                "name": "Switch On",
+                "@type": [
+                    "Action",
+                    "iot:SwitchOn"
                 ],
                 "outputdata": {
                     "@type": [
                         "iot:SwitchData"
                     ],
-                    "type": "boolean"
+                    "type": "boolean",
+                    "value": true
                 }
-            }
-        ]
-    },
-    {
-        "@context": [
-            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
-            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
+            },
             {
-                "iot": "http://iotschema.org/"
-            }
-        ],
-        "@type": [
-            "Thing"
-        ],
-        "name": "Intel-OCF-c440e5ef-a02f-49cf-b036-00b0738b0d86",
-        "interaction": [
-            {
+                "name": "Switch Off",
                 "@type": [
-                    "Property"
+                    "Action",
+                    "iot:SwitchOff"
                 ],
-                "link": [
-                    {
-                        "href": "https://gateway.mmccool.net:8000/api/oic/a/motion2?di=c440e5ef-a02f-49cf-b036-00b0738b0d86",
-                        "mediatype": "application/json"
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "@context": [
-            "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
-            "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
-            {
-                "iot": "http://iotschema.org/"
-            }
-        ],
-        "@type": [
-            "Thing"
-        ],
-        "name": "Intel-OCF-c75fe336-28d3-4b02-b52c-9a4daa9577f6",
-        "interaction": [
-            {
-                "@type": [
-                    "Property"
-                ],
-                "link": [
-                    {
-                        "href": "https://gateway.mmccool.net:8000/api/oic/a/illuminance2?di=c75fe336-28d3-4b02-b52c-9a4daa9577f6",
-                        "mediatype": "application/json"
-                    }
-                ]
+                "outputdata": {
+                    "@type": [
+                        "iot:SwitchData"
+                    ],
+                    "type": "boolean",
+                    "value": false
+                }
             }
         ]
     },

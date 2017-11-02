@@ -1,441 +1,165 @@
+// Auxiliary Metadata
+//
+// For each OCF resource type, list "inferred" data.
+//
+// The format here is intentionally similar to a WoT Thing Description.
+//
+// To keep things simple, for each OCF resource type there is
+// one and only one "Property", and it is listed first.  After
+// that, zero or more "Actions" and/or "Events" may be listed and will
+// be added to any the TD if they are present.  
+//
+// Any top-level semantic tags given will be merged with others used
+// by other resource types on the same device (duplicates will be 
+// removed) 
 {
-     // oic.r.doxm
-     // oic.r.pstat
-     "oic.wk.d": {
-        "writable": false,
-        // string consisting of elements from "crudn", e.g. "ru" means "read and update"
-        // for convenience, "w" may also be used as a synonym for "u" 
-        "method": "r", 
-        // which content types should go with which protocols.  Protocols can support more than one content type,
-        // in which case they should be in an array, with the preferred content type first.
-        "protocolContent": {
-            "http": "application/json", // can use HTTP with JSON
-            "coap": "application/cbor"  // can use CoAP with CBOR
-        },
-        // Output template (see later for input template)
-        "outputData": {
-            "type": "object",
-            // Named and typed parameters.  Types from {string, number, integer, boolean}
-            // If in an array, then multiple elements of this type in an array are supported;
-            // this can only be done if the interface content type below supports arrays
-            // see http://mjkoster.github.io/html/protocolbindings.html
-            "properties": {
-                "DI": {
-                    "type": "string" 
-                },
-                "N": {
-                    "type": "string"
-                },
-                "ICV": {
-                    "type": "string"
-                }
-            },
-            // Content type the application protocol driver expects.  
-            "templateType": "application/json", 
-            // Template.  Should be encoded in a string, and convertable to the other 
-            // content types supported by the driver.  Follows "mustache" conventions.
-            // If the params are in an array, this is a template only
-            // for the element type; the driver will generate an array wrapper.
-            // Note escaping for quotes; string values will be substituted without quotes
-            "template": "{\"di\":\"{{DI}}\",\"n\":\"{{N}}\",\"icv\":\"{{ICV}}\"}"
-        }
-     },
-     "oic.wk.p": {
-        "writable": false,
-        "method": "r",
-        "protocolContent": {
-            "http": "application/json",
-            "coap": "application/cbor"
-        },
-        "outputData": {
-            "properties": {
-                "PI": {
-                    "type": "string" 
-                },
-                "MNMN": {
-                    "type": "string" 
-                },
-                "MNPV": {
-                    "type": "string"
-                },
-                "MNFV": {
-                    "type": "string"
-                }
-            },
-            "templateType": "application/json", 
-            "template": "{\"pi\":\"{{PI}}\",\"mnmn\":\"{{MNMN}}\",\"mnpv\":\"{{MNPV}}\",\"mnfv\":\"{{MNFV}}\"}"
-        }
-     },
-     "oic.r.energy.consumption": {
-        "writable": false,
-        "method": "r",
-        "protocolContent": {
-            "http": "application/json",
-            "coap": "application/cbor"
-        },
-        "outputData": {
-            "properties": {
-                "ID": {
-                    "type": "string", 
-                    "@type": "ocf:id" 
-                },
-                "P1": {
-                    "type": "number", 
-                    "@type": "ocf:power" 
-                },
-                "P2": {
-                    "type": "number",
-                    "@type": "ocf:power" 
-                }
-            },
-            "templateType": "application/json", 
-            "template": "{\"id\":\"{{ID}}\",\"power1\":{{P1}},\"power2\":{{P2}}}"
-        }
-     },
-     "oic.r.solar": {
-        "writable": true,
-        "method": "ru",
-        "protocolContent": {
-            "http": "application/json",
-            "coap": "application/cbor"
-        },
-        // An example of an input template, but now template operates in reverse.
-        // Meant to be used with "reverse-mustache"
-        "inputData": {
-            "properties": {
-                "ID": {
-                    "type": "string"
-                }, 
-                "TP": {
-                    "type": "number" 
-                },
-                "L1": {
-                    "type": "string"
-                },
-                "L2": {
-                    "type": "string"
-                }
-            },
-            "templateType": "application/json", 
-            "template": "{\"id\":\"{{ID}}\",\"tiltPercentage\":{{TP}},\"lcd1\":\"{{L1}}\",\"lcd2\":\"{{L2}}\"}"
-        },
-        "outputData": {
-            "properties": {
-                "ID": {
-                    "type": "string"
-                }, 
-                "TP": {
-                    "type": "number" 
-                },
-                "L1": {
-                    "type": "string"
-                },
-                "L2": {
-                    "type": "string"
-                }
-            },
-            "templateType": "application/json", 
-            "template": "{\"id\":\"{{ID}}\",\"tiltPercentage\":{{TP}},\"lcd1\":\"{{L1}}\",\"lcd2\":\"{{L2}}\"}"
-        }
-     },
-     "oic.r.button": {
-        "writable": false,
-        "method": "r",
-        "protocolContent": {
-            "http": "application/json",
-            "coap": "application/cbor"
-        },
-        "outputData": {
-            "properties": {
-                "ID": {
-                    "type": "string"
-                }, 
-                "VALUE": {
-                    "type": "number" 
-                }
-            },
-            "templateType": "application/json",
-            "template": "{\"id\":\"{{ID}}\",\"value\":{{VALUE}}}"
-        }
-     },
-     "oic.r.sensor.illuminance": {
-        "writable": false,
-        "method": "ru",
-        "protocolContent": {
-            "http": "application/json",
-            "coap": "application/cbor"
-        },
-        "outputData": {
-            "properties": {
-                "ID": {
-                    "type": "string",
-                    "@type": "ocf:id"
-                }, 
-                "ILLUMINANCE": {
-                    "type": "number",
-                    "@type": "sch:level.value"
-                }
-            },
-            "templateType": "application/json",
-            "template": "{\"id\":\"{{ID}}\",\"illuminance\":{{ILLUMINANCE}}}"
-        }
-     },
-     "oic.r.fan": {
-        "writable": true,
-        "method": "ru",
-        "protocolContent": {
-            "http": "application/json",
-            "coap": "application/cbor"
-        },
-        "inputData": {
-            "properties": {
-                "ID": {
-                    "type": "string"
-                }, 
-                "VALUE": {
-                    "type": "boolean" 
-                }
-            },
-            "templateType": "application/json",
-            "template": "{\"id\":\"{{ID}}\",\"value\":{{VALUE}}}"
-        },
-        "outputData": {
-            "properties": {
-                "ID": {
-                    "type": "string"
-                }, 
-                "VALUE": {
-                    "type": "boolean" 
-                }
-            },
-            "templateType": "application/json",
-            "template": "{\"id\":\"{{ID}}\",\"value\":{{VALUE}}}"
-        }
-     },
-     "oic.r.sensor.carbondioxide": {
-        "writable": false,
-        "method": "r",
-        "protocolContent": {
-            "http": "application/json",
-            "coap": "application/cbor"
-        },
-        "outputData": {
-            "properties": {
-                "ID": {
-                    "type": "string"
-                }, 
-                "VALUE": {
-                    "type": "boolean" 
-                }
-            },
-            "templateType": "application/json",
-            "template": "{\"id\":\"{{ID}}\",\"value\":{{VALUE}}}"
-        }
-     },
-     "oic.r.switch.binary": {
-        "writable": false,
-        "method": "r",
-        "protocolContent": {
-            "http": "application/json",
-            "coap": "application/cbor"
-        },
-        "outputData": {
-            "properties": {
-                "ID": {
-                    "type": "string"
-                }, 
-                "VALUE": {
-                    "type": "boolean" 
-                }
-            },
-            "templateType": "application/json",
-            "template": "{\"id\":\"{{ID}}\",\"value\":{{VALUE}}}"
-        }
-     },
-     "oic.r.sensor.motion": {
-        "writable": false,
-        "method": "r",
-        "protocolContent": {
-            "http": "application/json",
-            "coap": "application/cbor"
-        },
-        "outputData": {
-            "properties": {
-                "ID": {
-                    "type": "string"
-                }, 
-                "VALUE": {
-                    "type": "boolean" 
-                }
-            },
-            "templateType": "application/json",
-            "template": "{\"id\":\"{{ID}}\",\"value\":{{VALUE}}}"
-        }
-     },
-     "oic.r.colour.rgb": {
-        "writable": true,
-        "method": "ru",
-        "protocolContent": {
-            "http": "application/json",
-            "coap": "application/cbor"
-        },
-        "inputData": {
-            "properties": {
-                "RED": {
-                    "type": "integer" 
-                },
-                "GREEN": {
-                    "type": "integer" 
-                },
-                "BLUE": {
-                    "type": "integer" 
-                }
-            },
-            "templateType": "application/json",
-            "template": "{\"rgbValue\":[{{RED}},{{GREEN}},{{BLUE}}]}"
-        },
-        "outputData": {
-            "properties": {
-                "ID": {
-                    "type": "string"
-                }, 
-                "RED": {
-                    "type": "integer" 
-                },
-                "GREEN": {
-                    "type": "integer" 
-                },
-                "BLUE": {
-                    "type": "integer" 
-                },
-                "LOWER": {
-                    "type": "integer" 
-                },
-                "UPPER": {
-                    "type": "integer" 
-                }
-            },
-            "templateType": "application/json",
-            "template": "{\"id\":\"{{ID}}\",\"rgbValue\":[{{RED}},{{GREEN}},{{BLUE}}],\"range\":[{{LOWER}},{{UPPER}}]}"
-        }
-     },
-     "oic.r.buzzer": {
-        "writable": true,
-        "method": "ru",
-        "protocolContent": {
-            "http": "application/json",
-            "coap": "application/cbor"
-        },
-        "inputData": {
-            "properties": {
-                "ID": {
-                    "type": "string"
-                }, 
-                "VALUE": {
-                    "type": "boolean" 
-                }
-            },
-            "templateType": "application/json",
-            "template": "{\"id\":\"{{ID}}\",\"value\":{{VALUE}}}"
-        },
-        "outputData": {
-            "properties": {
-                "ID": {
-                    "type": "string"
-                }, 
-                "VALUE": {
-                    "type": "boolean" 
-                }
-            },
-            "templateType": "application/json",
-            "template": "{\"id\":\"{{ID}}\",\"value\":{{VALUE}}}"
-        }
-     },
-     "oic.r.led": {
-        "writable": true,
-        "method": "ru",
-        "protocolContent": {
-            "http": "application/json",
-            "coap": "application/cbor"
-        },
-        "inputData": {
-            "properties": {
-                "ID": {
-                    "type": "string"
-                }, 
-                "VALUE": {
-                    "type": "boolean" 
-                }
-            },
-            "templateType": "application/json",
-            "template": "{\"id\":\"{{ID}}\",\"value\":{{VALUE}}}"
-        },
-        "outputData": {
-            "properties": {
-                "ID": {
-                    "type": "string"
-                }, 
-                "VALUE": {
-                    "type": "boolean" 
-                }
-            },
-            "templateType": "application/json",
-            "template": "{\"id\":\"{{ID}}\",\"value\":{{VALUE}}}"
-        }
-     },
-     "oic.r.sensor.environment": {
-        "writable": false,
-        "method": "r",
-        "protocolContent": {
-            "http": "application/json",
-            "coap": "application/cbor"
-        },
-        "outputData": {
-            "properties": {
-                "ID": {
-                    "type": "string"
-                }, 
-                "TEMPERATURE": {
-                    "type": "number" 
-                },
-                "HUMIDITY": {
-                    "type": "number" 
-                },
-                "PRESSURE": {
-                    "type": "number" 
-                },
-                "UVINDEX": {
-                    "type": "number" 
-                }
-            },
-            "templateType": "application/json",
-            "template": "{\"id\":\"{{ID}}\",\"temperature\":{{TEMPERATURE}},\"humidity\":{{HUMIDITY}},\"pressure\":{{PRESSURE}}, \"uvIndex\": {{UVINDEX}}}"
-        }
-     },
-     "oic.r.temperature": {
-        "writable": false,
-        "method": "r",
-        "protocolContent": {
-            "http": "application/json",
-            "coap": "application/cbor"
-        },
-        "outputData": {
-            "properties": {
-                "ID": {
-                    "type": "string"
-                }, 
-                "TEMPERATURE": {
-                    "type": "number" 
-                },
-                "UNITS": {
-                    "type": "string" 
-                },
-                "RANGE": {
-                    "type": "string" 
-                }
-            },
-            "templateType": "application/json",
-            "template": "{\"id\":\"{{ID}}\",\"temperature\":{{TEMPERATURE}},\"units\":\"{{UNITS}}\",\"range\":\"{{RANGE}}\"}"
-        }
-     }
+   "oic.r.led": {
+       "@type": ["iot:Light","iot:BinarySwitch"],
+       "interaction": [
+           {
+               "name": "Switch State",
+               "@type": ["Property","iot:SwitchStatus"],
+               "outputdata": {
+                  "@type": ["iot:SwitchData"],
+                  "type": "boolean"
+               }
+           },
+           {
+               "name": "Switch On",
+               "@type": ["Action","iot:SwitchOn"],
+               "outputdata": {
+                  "@type": ["iot:SwitchData"],
+                  "type": "boolean",
+                  "value": true
+               }
+           },
+           {
+               "name": "Switch Off",
+               "@type": ["Action","iot:SwitchOff"],
+               "outputdata": {
+                  "@type": ["iot:SwitchData"],
+                  "type": "boolean",
+                  "value": false
+               }
+           }
+       ]
+   },
+/*
+   "oic.r.colour.rgb": {
+       "@type": ["iot:Light","iot:BinarySwitch"],
+       "interaction": [
+           {
+               "name": "Switch State",
+               "@type": ["Property","iot:SwitchStatus"],
+               "outputdata": {
+                  "@type": ["iot:SwitchData"],
+                  "type": "boolean"
+               }
+           },
+           {
+               "name": "Switch On",
+               "@type": ["Action","iot:SwitchOn"],
+               "outputdata": {
+                  "@type": ["iot:SwitchData"],
+                  "type": "boolean",
+                  "value": true
+               }
+           },
+           {
+               "name": "Switch Off",
+               "@type": ["Action","iot:SwitchOff"],
+               "outputdata": {
+                  "@type": ["iot:SwitchData"],
+                  "type": "boolean",
+                  "value": false
+               }
+           }
+       ]
+   },
+*/
+   "oic.r.sensor.motion": {
+       "@type": ["iot:BinarySwitch"],
+       "interaction": [
+           {
+               "name": "Switch State",
+               "@type": ["Property","iot:SwitchStatus"],
+               "outputdata": {
+                  "@type": ["iot:SwitchData"],
+                  "type": "boolean"
+               }
+           }
+       ]
+   },
+   "oic.r.temperature": {
+       "@type": ["iot:Temperature"],
+       "interaction": [
+           {
+               "name": "Temperature",
+               "@type": ["Property","iot:TemperatureStatus"],
+               "outputdata": {
+                  "@type": ["iot:TemperatureData"],
+                  "type": "number",
+                  "unit": "string"
+               }
+           }
+       ]
+   },
+   "oic.r.button": {
+       "@type": ["iot:BinarySwitch"],
+       "interaction": [
+           {
+               "name": "Switch State",
+               "@type": ["Property","iot:SwitchStatus"],
+               "outputdata": {
+                  "@type": ["iot:SwitchData"],
+                  "type": "boolean"
+               }
+           }
+       ]
+   },
+   "oic.r.sensor.illuminance": {
+       "@type": ["iot:Illuminance"],
+       "interaction": [
+           {
+               "name": "Illuminance",
+               "@type": ["Property","iot:IlluminanceStatus"],
+               "outputdata": {
+                  "@type": ["iot:IlluminanceData"],
+                  "type": "number",
+                  "unit": "string"
+               }
+           }
+       ]
+   },
+   "oic.r.buzzer": {
+       "@type": ["iot:BinarySwitch"],
+       "interaction": [
+           {
+               "name": "Switch State",
+               "@type": ["Property","iot:SwitchStatus"],
+               "outputdata": {
+                  "@type": ["iot:SwitchData"],
+                  "type": "boolean"
+               }
+           },
+           {
+               "name": "Switch On",
+               "@type": ["Action","iot:SwitchOn"],
+               "outputdata": {
+                  "@type": ["iot:SwitchData"],
+                  "type": "boolean",
+                  "value": true
+               }
+           },
+           {
+               "name": "Switch Off",
+               "@type": ["Action","iot:SwitchOff"],
+               "outputdata": {
+                  "@type": ["iot:SwitchData"],
+                  "type": "boolean",
+                  "value": false
+               }
+           }
+       ]
+   }
 }
