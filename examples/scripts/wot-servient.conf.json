@@ -1,0 +1,13 @@
+{
+    "servient": {
+        "scriptDir": "counter",
+        "scriptAction": false
+    },
+    "http": {
+        "port": 8080
+    },
+    "log": {
+        "level": 3
+    }
+}
+
