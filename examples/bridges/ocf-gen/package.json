@@ -5,7 +5,11 @@
   "description": "Generate Web of Things TD from OCF Resources",
   "main": "ocf-gen.js",
   "author": "Michael McCool (michael.mccool@intel.com)",
-  "license": "W3C",
+  "license": "NONE - Not Yet Licensed for External Use",
+  "main": "ocf-gen.js",
+  "scripts": {
+    "start": "node ocf-gen.js"
+  },
   "dependencies": {
     "http": "0.0.0",
     "ip": "^1.1.5",

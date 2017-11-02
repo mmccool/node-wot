@@ -5,7 +5,7 @@
  // network.  This script first queries the OCF gateway to discover
  // all the local OCF resources, then constructs a WoT Thing Description,
  // to provide access to them, then serves it over a local port via HTTP,
- // making it avail to WoT devices that may want to consume it.
+ // making it available to WoT devices that may want to consume it.
  //
  // See https://01.org/smarthome and https://github.com/01org/SmartHome-Demo
  // on how to set up a suitable test system.  Note that you don't need
@@ -13,8 +13,31 @@
  // which can be found here: https://github.com/01org/iot-rest-api-server/
  
 // Options
-const use_local_host = false;
 
+// Output uses util.debuglog, so NODE_DEBUG needs to include
+// one of the following keys for results to show up.
+var util_q = require('util');
+var basic_log = util_q.debuglog('wot-ocf-gen');
+var info_log = util_q.debuglog('wot-ocf-gen-info');
+var debug_log = util_q.debuglog('wot-ocf-gen-debug');
+var verbose_log = util_q.debuglog('wot-ocf-gen-verbose');
+var silly_log = util_q.debuglog('wot-ocf-gen-silly');
+
+// Where to find iot-rest-api-server
+//    a GET on http(s)://<ocf_host>:<ocf_port>/api/oic/res
+//    should return OCF resources
+const ocf_host = "gateway.mmccool.net";
+const ocf_port = 8000; 
+const ocf_protocol = "https"; // or https or http, depending
+
+// Always serves TD on localhost
+//   a GET on http://<td_host>:<td_port>/ 
+//   (a) initiate a rescan and retranslate (b) will return the TD
+// NOTE: currently only HTTP supported
+const td_host = "localhost";
+const td_port = 8091;  // port to make TD available on
+
+// Dependencies
 const request = require("request");
  
 // Helper function to pretty-print JSON
@@ -40,64 +63,46 @@ function concatMaps(A,B) {
 const shush = require("shush");
 const metadata = shush("metadata.json");
 
-// Get current host IP
-const ip = require("ip");
-const cur_host = ip.address();
-console.log("current host: ",cur_host);
-const use_cur_host = !use_local_host;
-
-// Ports to serve TD on; a GET on http://<td_host>:<td_port>/ should return the TD
-const td_host = (use_cur_host ? cur_host : "127.0.0.1");
-const td_port = 8091;
-
-// Host/Port that OCF gateway/bridge (eg iot-rest-api-server) is on; 
-// a GET on http://<ocf_host>:<ocf_port>/api/oic/res should return OCF resources
-const ocf_host = use_cur_host ? cur_host : "127.0.0.1";
-const ocf_port = 8000;
-
-// Verbosity level (0 is quiet, 1 some messages, 2 more messages, pretty-print data)
-const verbose = 2;
+// Get current host IP (Use for local links...)
+const ip = require("ip"); // not used yet
+info_log("Current host IP: ",ip.address());
 
 // Get OCF resources from OCF REST API Server on OCF Gateway, Generate TD
-function generate_td(ocf_host,ocf_port,td_host,td_port,done_callback) {
-    // TODO: assumes HTTP only... but COAP also possible, as well as multiple host IPs
-    const ocf_base = 'http://' + ocf_host + ':' + ocf_port + '/api';
-    if (verbose) console.log("OCF Base: ",ocf_base);
+function generate_td(ocf_protocol,ocf_host,ocf_port,td_host,td_port,done_callback) {
+    const ocf_base = ocf_protocol + '://' + ocf_host + ':' + ocf_port + '/api';
+    debug_log("OCF Base: ",ocf_base);
     const td_base = 'http://' + td_host + ':' + td_port;
-    if (verbose) console.log("TD Base: ",td_base);
+    debug_log("TD Base: ",td_base);
     const res_url = ocf_base + '/oic/res';
-    if (verbose) console.log("OCF Resource URL: ",res_url);
+    basic_log("OCF Resource URL: ",res_url);
     request(res_url,function(error,response,res_body) {
       if (error) throw ("OCF Gateway is not responding ("+error+")");
-      if (verbose > 1) console.log("OCF resource response body: "+res_body);
+      basic_log('OCF Resources - Response received');
+      silly_log("OCF resource response body: "+res_body);
       let resources = undefined;
       try {
           resources = JSON.parse(res_body);
-          if (verbose > 1) {
-              // Pretty-print OCF Resource Description
-              console.log('OCF Resource - Response');
-              console.log(json_pp(resources));
-          }
+          // Pretty-print OCF Resource Description
+          silly_log(json_pp(resources));
       } catch(e) {
           throw("Could not parse response from OCF Gateway as JSON ("+e+")");
       }
       if (!Array.isArray(resources)) throw "Array expected";
 
       // Now also try to get device descriptions
+      // NOTE: for some reason these are not always complete.  Better to 
+      // scan the /res for unique device IDs
       const des_url = ocf_base + '/oic/d';
-      if (verbose) console.log("OCF Description URL: ",des_url);
+      basic_log("OCF Description URL: ",des_url);
       request(des_url,function(error,response,des_body) {
           if (error) throw ("OCF Gateway is not responding ("+error+")");
-          if (verbose > 1) console.log("OCF description response body: "+des_body);
-
+          silly_log("OCF description response body: "+des_body);
           let descriptions = undefined;
           try {
               descriptions = JSON.parse(des_body);
-              if (verbose > 1) {
-                  // Pretty-print Descriptions
-                  console.log('OCF Description - Response');
-                  console.log(json_pp(descriptions));
-              }
+              // Pretty-print Descriptions
+              info_log('OCF Description - Response received');
+              silly_log(json_pp(descriptions));
           } catch(e) {
               throw("Could not parse response from OCF Gateway as JSON ("+e+")");
           }
@@ -143,7 +148,7 @@ function generate_td(ocf_host,ocf_port,td_host,td_port,done_callback) {
               }
 
               // Create initial template for Property interaction 
-              if (verbose > 1) console.log("creating resources for device ",resource_di);
+              debug_log("Creating resources for device ",resource_di);
               let interaction = {
                 "@type": ["Property", "ocf:Resource"],
                 "ocf:di": resource_di,
@@ -224,7 +229,7 @@ function generate_td(ocf_host,ocf_port,td_host,td_port,done_callback) {
                   const full_link_href = ocf_base + '/oic' + link_href + "?di=" + resource_di;
 
                   // Append new link
-                  if (verbose > 1) console.log("creating link ",link_href);
+                  debug_log("Creating link ",link_href);
                   interaction.link.push({
                     "href": full_link_href,
                     "coap:rt": link_rt,
@@ -277,11 +282,9 @@ function generate_td(ocf_host,ocf_port,td_host,td_port,done_callback) {
               // Append interaction to device
               td.interaction.push(interaction);
           }
-          if (verbose > 1) {
-              // Pretty-print TD
-              console.log("Generated OCF TD:");
-              console.log(json_pp(td));
-          }
+          // Pretty-print TD
+          info_log("Generated OCF TD");
+          silly_log(json_pp(td));
           done_callback(td);
        });
    });
@@ -289,20 +292,20 @@ function generate_td(ocf_host,ocf_port,td_host,td_port,done_callback) {
 
 // Construct TD, provide via web server
 const http = require('http');
-if (verbose) console.log("OCF Thing Description generation");
+basic_log("OCF Thing Description generation");
 const td_url = 'http://' + td_host + ':' + td_port + '/';
 const server = http.createServer(function(req,res) {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/ld+json');
     res.setHeader('Access-Control-Allow-Origin', '*');
-    generate_td(ocf_host,ocf_port,td_host,td_port,function(td) {
-        res.end(JSON.stringify(td));
-        
-        if (verbose) console.log("New TD generated; now available at: ",td_url);
-    });
+    generate_td(ocf_protocol,ocf_host,ocf_port,td_host,td_port,
+        function(td) {
+            res.end(JSON.stringify(td));
+            basic_log("New TD generated; now available at: ",td_url);
+        });
 });
 server.listen(td_port,td_host,function() {
-    console.log('Server running at ',td_url);
+    basic_log('WoT-OCF TD Gen server running at ',td_url);
 });
 
 
