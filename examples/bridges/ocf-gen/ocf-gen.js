@@ -14,6 +14,13 @@
  
 // Options
 
+// How often to scan OCF metadata and update TDs. 
+var scan_period = 10000;  // milliseconds
+
+// How long until TDs expire in Thing Directory.
+//   needs to be larger than scan_period, of course.
+var td_timeout = 15000; // milliseconds
+
 // Output uses util.debuglog, so NODE_DEBUG needs to include
 // one of the following keys for results to show up.
 var util_q = require('util');
@@ -67,17 +74,26 @@ const metadata = shush("metadata.json");
 const ip = require("ip"); // not used yet
 info_log("Current host IP: ",ip.address());
 
-// Get OCF resources from OCF REST API Server on OCF Gateway, Generate TD
-function generate_td(ocf_protocol,ocf_host,ocf_port,td_host,td_port,done_callback) {
+// Get OCF resources from OCF REST API Server 
+// on OCF Gateway and normalize; return array
+// with one entry per device ID, and with OCF-specific
+// resources stripped out.  Async function, calls
+// done_callback when complete. 
+function get_ocf_metadata(
+    ocf_protocol, // http or https
+    ocf_host,     // hostname (or IP) of OCF iot-rest-api-server
+    ocf_port,     // port used by iot-rest-api-server
+    done_callback // call when done
+) {
     const ocf_base = ocf_protocol + '://' + ocf_host + ':' + ocf_port + '/api';
     debug_log("OCF Base: ",ocf_base);
-    const td_base = 'http://' + td_host + ':' + td_port;
-    debug_log("TD Base: ",td_base);
     const res_url = ocf_base + '/oic/res';
     basic_log("OCF Resource URL: ",res_url);
+
+    // Query OCF Resources through gateway running iot-rest-api-server
     request(res_url,function(error,response,res_body) {
       if (error) throw ("OCF Gateway is not responding ("+error+")");
-      basic_log('OCF Resources - Response received');
+      basic_log('OCF resources - Response received');
       silly_log("OCF resource response body: "+res_body);
       let resources = undefined;
       try {
@@ -91,7 +107,8 @@ function generate_td(ocf_protocol,ocf_host,ocf_port,td_host,td_port,done_callbac
 
       // Now also try to get device descriptions
       // NOTE: for some reason these are not always complete.  Better to 
-      // scan the /res for unique device IDs
+      // scan the /res for unique device IDs.  However, human-readable
+      // descriptions are only available from d, so...
       const des_url = ocf_base + '/oic/d';
       basic_log("OCF Description URL: ",des_url);
       request(des_url,function(error,response,des_body) {
@@ -108,15 +125,7 @@ function generate_td(ocf_protocol,ocf_host,ocf_port,td_host,td_port,done_callbac
           }
           if (!Array.isArray(descriptions)) throw "Array expected";
 
-          let td = {
-              "name": "ocf",
-              "@context": ["http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
-                           "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
-                           "http://w3c.github.io/wot/w3c-wot-coap-context.jsonld",
-                           "http://w3c.github.io/wot/w3c-wot-ocf-context.jsonld"],
-              "@type": [ "Thing", "ocf:Devices" ],
-              "interaction": []
-          };
+          let ocf_metadata = [];
           for (let resource of resources) {
               const resource_di = resource["di"];
               if (undefined === resource_di) throw "Resource with undefined di";
@@ -147,7 +156,7 @@ function generate_td(ocf_protocol,ocf_host,ocf_port,td_host,td_port,done_callbac
                   if (link["p"]["bm"] & link_p_bm_observable_mask) resource_observable = true;
               }
 
-              // Create initial template for Property interaction 
+              // Create initial template for interaction
               debug_log("Creating resources for device ",resource_di);
               let interaction = {
                 "@type": ["Property", "ocf:Resource"],
@@ -279,33 +288,71 @@ function generate_td(ocf_protocol,ocf_host,ocf_port,td_host,td_port,done_callbac
                   };
               }
 
-              // Append interaction to device
-              td.interaction.push(interaction);
+              // Append interaction to normalized metadata
+              ocf_metadata.push(interaction);
           }
-          // Pretty-print TD
-          info_log("Generated OCF TD");
-          silly_log(json_pp(td));
-          done_callback(td);
+          // Pretty-print ocf metadata
+          info_log("Normalized OCF metadata");
+          silly_log(json_pp(ocf_metadata));
+          done_callback(ocf_metadata);
        });
    });
 }
 
-// Construct TD, provide via web server
+// Generate array of TDs (one per device ID)
+//  from normalized OCF metadata
+function generate_tds(ocf_metadata,done_callback) {
+    done_callback(ocf_metadata); // cheating, for now
+}
+
+// Construct TD database from OCF metadata, store in variable 
+// also call done_callback with copy of updated database
+function construct_TDs(ocf_protocol,ocf_host,ocf_port,done_callback) {
+    get_ocf_metadata(ocf_protocol,ocf_host,ocf_port,
+        function(ocf_metadata) {
+            generate_tds(ocf_metadata,
+                function(tds) {
+                    done_callback(tds);
+                }
+            );
+        }
+    );
+}
+
+// Scan TDs and update database.
+// TODO: this should also send updates to the Thing Directory
+let TDs = [];
+function scan_TDs() {
+    construct_TDs(ocf_protocol,ocf_host,ocf_port,
+        function(tds) {
+          TDs = tds;
+          basic_log("Scan complete; TD database updated");
+        }
+    );
+}
+
+// Invoke scan and translation periodically
+setInterval(scan_TDs,scan_period);
+
+// Do an initial scan to initialize TD database
+scan_TDs();
+
+// Provide (pre-scanned) TDs via web server
 const http = require('http');
-basic_log("OCF Thing Description generation");
+basic_log("OCF Thing Description Metadata Bridge");
+
 const td_url = 'http://' + td_host + ':' + td_port + '/';
+
 const server = http.createServer(function(req,res) {
+    basic_log("TD request received at",td_url);
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/ld+json');
     res.setHeader('Access-Control-Allow-Origin', '*');
-    generate_td(ocf_protocol,ocf_host,ocf_port,td_host,td_port,
-        function(td) {
-            res.end(JSON.stringify(td));
-            basic_log("New TD generated; now available at: ",td_url);
-        });
+    res.end(JSON.stringify(TDs));
 });
+
 server.listen(td_port,td_host,function() {
-    basic_log('WoT-OCF TD Gen server running at ',td_url);
+    basic_log('http server running at ',td_url);
 });
 
 
