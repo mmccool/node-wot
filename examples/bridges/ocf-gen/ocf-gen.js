@@ -15,10 +15,10 @@
 // Options
 
 // How often to scan OCF metadata and update TDs. 
-var scan_period = 10000;  // milliseconds
+var scan_period = 10*1000;  // milliseconds
 
 // How often to scan OCF descriptions and update description database
-var scan_descs_period = 30000;  // milliseconds
+var scan_descs_period = 60*1000;  // milliseconds
 
 // How long until TDs expire in Thing Directory.
 //   needs to be larger than scan_period, of course.
@@ -78,8 +78,6 @@ const metadata = shush("metadata.json");
 const ip = require("ip"); // not used yet
 info_log("Current host IP: ",ip.address());
 
-// OCF Resource types to ignore, except for fetching metadata
-ocf_ignore_rt = ["oic.wk.p","oic.wk.d","oic.r.doxm","oic.r.pstat"];
 
 // Get OCF device descriptions from OCF /oic/d interface
 // We do this asynchronously with the other request to (a) catch
@@ -108,7 +106,8 @@ function scan_ocf_descs() {
            ocf_descs[descs[i].di] = descs[i].n;
        }
 
-       verbose_log("updated descriptions: ",ocf_descs);
+       info_log("updated descriptions");
+       verbose_log(json_pp(ocf_descs));
    });
 }
 
@@ -118,17 +117,21 @@ setInterval(scan_ocf_descs,scan_descs_period);
 // Run at startup to initialize description database
 scan_ocf_descs();
 
+// OCF Resource types to ignore, except for fetching metadata
+ocf_ignore_rt = ["oic.wk.p","oic.wk.d","oic.r.doxm","oic.r.pstat"];
+
+// All OCF Resource types found (use to fetch external metadata...)
+ocf_found_rt = [];
+
 // Get OCF resources from OCF REST API Server on OCF Gateway and normalize;
 // return array with one entry per device ID, and with OCF-specific
-// resources stripped out.  Async function, calls
-// done_callback when complete. 
+// resources stripped out.  Async function, calls done_callback when complete. 
 function get_ocf_metadata(
     ocf_protocol, // http or https
     ocf_host,     // hostname (or IP) of OCF iot-rest-api-server
     ocf_port,     // port used by iot-rest-api-server
     done_callback // call when done
 ) {
-    debug_log("OCF Base: ",ocf_base);
     const res_url = ocf_base + '/oic/res';
     basic_log("OCF Resource URL: ",res_url);
 
@@ -148,193 +151,160 @@ function get_ocf_metadata(
       if (!Array.isArray(resources)) throw "Array expected";
 
       // initial database is empty
-      let ocf_metadata = [];
+      let ocf_metadata = []; // map from unique dis -> array of resources
 
       // scan through all resources listed
       for (let resource of resources) {
+          // Get device ID
           const resource_di = resource["di"];
           if (undefined === resource_di) throw "Resource with undefined di";
 
-          // Find descriptive name of current device id
-          let resource_n = ocf_descs[resource_di]; 
-          if (undefined === resource_n) resource_n = resource_di;
+          // Find record in current database; if empty, create it
+          if (undefined === ocf_metadata[resource_di]) {
+             // Find descriptive name 
+             let resource_n = ocf_descs[resource_di]; 
+             if (undefined === resource_n) resource_n = resource_di;
 
-          // Since di can have characters that won't work in a URL, like spaces, fix it up...
-          let resource_name = resource_n;
-          resource_name = resource_name.replace(/ /g,"");
-
-          // Recover links
-          const links = resource["links"];
-          if (undefined === links) throw "Resource with undefined links";
-
-          // Determine if any link is marked observable; if so, consider entire
-          // resource observable
-          let resource_observable = false;
-          const link_p_bm_discoverable_mask = 1;
-          const link_p_bm_observable_mask = 2;
-          for (let link of links) {
-              if (link["p"]["bm"] & link_p_bm_observable_mask) resource_observable = true;
+             // Create initial record with empty links
+             ocf_metadata[resource_di] = {
+                 "name": resource_n,
+                 "links": []
+             };
           }
 
-          // Create initial template for interaction
-          debug_log("Creating resources for device ",resource_di);
-          let interaction = {
-              "@type": ["Property", "ocf:Resource"],
-              "ocf:di": resource_di,
-              "link": [] // initial state; will append to below
-          };
-          if (undefined !== resource_name) interaction["name"] = resource_name; // Mandatory in TD?
-          if (undefined !== resource_n) interaction["ocf:n"] = resource_n; // Original "n" value from oic/d.n
+          // Get device links
+          const resource_links = resource["links"];
+          if (undefined === resource_di) throw "Resource with no links";
 
-          // Fill in link data for resources in interaction; look up extra metadata as necessary
-          let resource_writable = false; // default
-          let resource_inputdata = false;
-          let resource_inputdata_properties = {}; // filled in with union of properties from all links
-          let resource_outputdata = false;
-          let resource_outputdata_properties = {}; // filled in with union of properties from all links
+          // Filter out "ignored" elements, copy useful information out
+          let i = ocf_metadata[resource_di].links.length;
+          for (let j = 0; j < resource_links.length; j++) {
+            let link = resource_links[j];
+            let rt = link.rt;
 
-          // Scan through each link (in general, multiple are possible)
-          for (let link of links) {
-              let link_href = link["href"];
-              // fix annoying inconsistency; sometime oic is included in path,
-              // sometimes not...  Normalize by stripping any leading "/oic"
-              // TODO: revisit after corrections to IoTivity/interpretation of spec
-              link_href = link_href.replace(/^\/oic/,'');
+            // if rt not found in prior list, add it
+            if (ocf_found_rt.indexOf(rt) === -1) {
+                let k = ocf_found_rt.length;
+                ocf_found_rt[k] = rt;
+            }
 
-              // get other values from OCF link structure
-              // Following convert-scalars-to-arrays is to normalize IoTivity results
-              const link_rt = Array.isArray(link["rt"]) ? link["rt"] : [link["rt"]]; // should be arrays
-              const link_if = Array.isArray(link["if"]) ? link["if"] : [link["if"]]; // should be arrays
-              const link_p = link["p"];
-              const link_p_bm = link_p["bm"];
-              const link_p_secure = link_p["secure"];
-
-              // look up additional metadata from links
-              let link_inputdata = false;
-              let link_inputdata_template = [];
-              let link_inputdata_template_type = [];
-
-              let link_outputdata = false;
-              let link_outputdata_template = [];
-              let link_outputdata_template_type = [];
-
-              // Scan through each rt (in general, multiple are possible)
-              let link_ignore = true; // only remains true if all rts are ignorable
-              for (let rt of link_rt) {
-                  // Skip "ignorable" rts
-                  basic_log(rt.toString()," in ",ocf_ignore_rt," = ",ocf_ignore_rt.indexOf(rt) != -1);
-                  if (ocf_ignore_rt.indexOf(rt) != -1) continue;
-                  link_ignore = false; 
-
-                  // Gather metadata for other rts
-                  const md = metadata[rt];
-                  if (md) {
-                      if (md["writable"]) resource_writable = true;
-                      const md_inputdata = md["inputData"];
-                      if (md_inputdata) {
-                          link_inputdata = true;
-                          link_inputdata_template_type.push(md_inputdata["templateType"]);
-                          link_inputdata_template.push(md_inputdata["template"]);
-                          resource_inputdata = true;
-                          resource_inputdata_properties = concatMaps(
-                              resource_inputdata_properties,
-                              md_inputdata["properties"]
-                          );
-                      }
-                      const md_outputdata = md["outputData"];
-                      if (md_outputdata) {
-                          link_outputdata = true;
-                          link_outputdata_template_type.push(md_outputdata["templateType"]);
-                          link_outputdata_template.push(md_outputdata["template"]);
-                          resource_outputdata = true;
-                          resource_outputdata_properties = concatMaps(
-                              resource_outputdata_properties,
-                              md_outputdata["properties"]
-                          );
-                      }
-                  }
-              }
-
-              // TODO: since link_rt and link_if can be arrays, and in fact according the OCF spec
-              // (but not IoTivity currently) MUST be arrays even if with only one element, then
-              // different "views" may have different interaction models (eg writes not permitted) or
-              // data models (different subsets of parameters). Should these be different links/resources
-              // in the WoT TD, or do we need to deal with optional elements in the data models?
-
-              // Rebuild URL, including di as a query parameter
-              // TODO: this may or may not be a bug in IoTivity, check OCF spec to see if di is really necessary 
-              // UPDATE: Checked OCF spec; it's not clear. Including the di does not seem to be wrong, at least.
-              // NOTE: This does mean that if you want to add extra parameters, use & not ? before each
-              const full_link_href = ocf_base + '/oic' + link_href + "?di=" + resource_di;
-
-              if (!link_ignore) {
-                  // Append new link
-                  debug_log("Creating link ",link_href);
-                  interaction.link.push({
-                      "href": full_link_href,
-                      "coap:rt": link_rt,
-                      "coap:if": link_if,
-                      "ocf:p": {
-                          "ocf:bm": link_p_bm,
-                          "ocf:secure": link_p_secure
-                       },
-                       // TODO: look up mediatype based on protocolContent metadata, protocol used for link
-                       "mediaType": "application/json", 
-                       "driver": "ocf" // for template conversion
-                  });
-                  let lastlink = interaction.link.length - 1;
-
-                  // Add extra metadata for template to link just added
-                  if (link_inputdata) {
-                      interaction.link[lastlink]["inputData"] = {
-                          "templateType": link_inputdata_template_type,
-                          "template": link_inputdata_template
-                      };
-                  }
-                  if (link_outputdata) {
-                      interaction.link[lastlink]["outputData"] = {
-                          "templateType": link_outputdata_template_type,
-                          "template": link_outputdata_template
-                      };
-                  }
-              }
-
-	      // fill in extra data gathered from links
-	      interaction["writable"] = resource_writable;
-	      if (resource_inputdata) {
-	          interaction["inputData"] = {
-	              "valueType": {
-		          "type": "object"  // always a generic object
-		      },
-  	              // merged map of all properties in all links..
-		      "properties": resource_inputdata_properties
-	          };
-	      }
-	      if (resource_outputdata) {
-	          interaction["outputData"] = {
-		      "valueType": {
-		          "type": "object"  // always a generic object
-	              },
-		      // merged map of all properties in all links...
-	              "properties": resource_outputdata_properties
-		  };
-              }
-
-	      // Append interaction to normalized metadata
-	      ocf_metadata.push(interaction);
+            // if rt not found in blacklist, add link to output
+            if (ocf_ignore_rt.indexOf(rt) === -1) {
+              ocf_metadata[resource_di].links[i] = link;
+              i++;
+            }
           }
        }
-       // Pretty-print ocf metadata
+
+       // log ocf metadata
        info_log("Normalized OCF metadata");
-       silly_log(json_pp(ocf_metadata));
+       verbose_log(json_pp(ocf_metadata));
+
+       // log ocf rts
+       info_log("Found OCF rts");
+       verbose_log(json_pp(ocf_found_rt));
+
+       // Call continuation
        done_callback(ocf_metadata);
    });
 }
 
+// Read Auxiliary metadatabase
+// for each rt, list some extra, "inferred" data to include
+// TODO: read this from an external JSON file/database
+let aux_metadata = {
+   "oic.r.led": {
+       "@type": ["iot:Light","iot:BinarySwitch"],
+       "interaction": {
+           "name": "LED State",
+           "@type": ["iot:SwitchStatus"],
+           "outputdata": {
+              "@type": ["iot:SwitchData"],
+              "type": "boolean"
+           },
+       }
+   }
+};
+
+// Used at plugfest...
+// name_prefix = "";
+name_prefix = "Intel-OCF-";
+
 // Generate array of TDs (one per device ID)
 //  from normalized OCF metadata
 function generate_tds(ocf_metadata,done_callback) {
-    done_callback(ocf_metadata); // cheating, for now
+    let prop_base = ocf_base + "/oic";
+    let tds = [];
+    let i = 0;
+    // look at all key/value pairs
+    Object.keys(ocf_metadata).forEach(function(di) {
+      // check that the links are not empty
+      let links = ocf_metadata[di].links;
+      if ([] !== links) {
+          // TD header for this device
+          let td = {
+              "@context": [
+                  "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
+                  "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
+	          {"iot": "http://iotschema.org/"}
+               ],
+               "@type": [ "Thing" ],
+               "name": name_prefix + ocf_metadata[di].name,
+               "interaction": []
+          };
+          // convert OCF links to WoT properties
+          for (let j=0; j < links.length; j++) { 
+              let link = links[j];
+              let href = link.href;
+              let rt = link.rt;
+              // Figure out name for property
+              let aux = undefined;
+              if (undefined !== link.rt) {
+                  aux = aux_metadata[link.rt];
+              }
+              let name;
+              if (aux) {
+                  name = aux.interaction.name;
+              } else {
+                  name = link.href.split("/")[-1];
+              }
+              // Set up basic header
+              let interaction = {
+                  "name": name,
+                  "@type": ["Property"],
+                  "link": [
+                      {
+                          "href": prop_base + link.href
+                           + "?di=" + di,
+                          "mediatype": "application/json"
+                      }
+                  ]
+              };
+              if (aux) {
+                  // add inputdata protocol binding, if any
+                  if (aux.interaction.inputdata) {
+                      interaction.inputdata = aux.interaction.inputdata;
+                  }
+                  // add outputdata protocol binding, if any
+                  if (aux.interaction.outputdata) {
+                      interaction.outputdata = aux.interaction.outputdata;
+                  }
+                  // add extra semantic tags for interaction (if any)
+                  interaction["@type"] = 
+                      interaction["@type"].concat(aux.interaction["@type"]);
+                  // add extra semantic tags for entire thing (if any)
+                  td["@type"] = 
+                      td["@type"].concat(aux["@type"]);
+              }
+              // append WoT interaction for this OCF resource
+              td.interaction[j] = interaction;
+          }
+          // TODO: remove duplicate global semantic tags
+          tds[i] = td;
+          i++;
+       }
+    });
+    done_callback(tds); 
 }
 
 // Construct TD database from OCF metadata, store in variable 
@@ -380,6 +350,8 @@ const server = http.createServer(function(req,res) {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/ld+json');
     res.setHeader('Access-Control-Allow-Origin', '*');
+    basic_log("!!!!",JSON.stringify(TDs));
+    basic_log(">>>>",json_pp(TDs));
     res.end(JSON.stringify(TDs));
 });
 
