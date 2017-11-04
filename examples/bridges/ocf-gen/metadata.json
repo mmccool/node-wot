@@ -14,13 +14,16 @@
 // removed) 
 {
    "oic.r.led": {
-       "@type": ["http://iotschema.org/LightControl",
+       "@type": ["Light",
+                 "http://iotschema.org/LightControl",
                  "http://iotschema.org/Actuator",
                  "http://iotschema.org/BinarySwitch"],
        "interaction": [
            {
                "name": "Switch Status",
-               "@type": ["Property","http://iotschema.org/SwitchStatus"],
+               "@type": ["Property",
+                         "OnOffState",
+                         "http://iotschema.org/SwitchStatus"],
                "outputData": {
                   "type": "object",
                   "fields": [
@@ -36,7 +39,9 @@
            },
            {
                "name": "Turn On",
-               "@type": ["Action","http://iotschema.org/TurnOn"],
+               "@type": ["Action",
+                         "OnCommand",
+                         "http://iotschema.org/TurnOn"],
                "outputData": {
                   "type": "object",
                   "fields": [
@@ -53,7 +58,9 @@
            },
            {
                "name": "Turn Off",
-               "@type": ["Action","http://iotschema.org/TurnOff"],
+               "@type": ["Action",
+                         "OffCommand",
+                         "http://iotschema.org/TurnOff"],
                "outputData": {
                   "type": "object",
                   "fields": [
@@ -71,12 +78,14 @@
        ]
    },
    "oic.r.colour.rgb": {
-       "@type": ["http://iotschema.org/Light",
+       "@type": ["Light",
+                 "http://iotschema.org/Light",
                  "http://iotschema.org/Actuator"],
        "interaction": [
            {
                "name": "Light Colour",
-               "@type": ["Property","http://iotschema.org/CurrentColour"],
+               "@type": ["Property",
+                         "http://iotschema.org/CurrentColour"],
                "outputData": {
                    "type": "object",
                    "fields": [
@@ -106,12 +115,15 @@
        ]
    },
    "oic.r.sensor.motion": {
-       "@type": ["http://iotschema.org/MotionControl",
+       "@type": ["Motion",
+                 "http://iotschema.org/MotionControl",
                  "http://iotschema.org/Sensor"],
        "interaction": [
            {
                "name": "Motion Detected",
-               "@type": ["Property","http://iotschema.org/MotionDetected"],
+               "@type": ["Property",
+                         "Occupancy",
+                         "http://iotschema.org/MotionDetected"],
                "inputData": {
                    "type": "object",
                    "fields": [
@@ -128,15 +140,19 @@
        ]
    },
    "oic.r.temperature": {
-       "@type": ["http://iotschema.org/TemperatureSensing",
+       "@type": ["Temperature",
+                 "http://iotschema.org/TemperatureSensing",
                  "http://iotschema.org/Sensor"],
        "interaction": [
            {
                "name": "Temperature",
-               "@type": ["Property","http://iotschema.org/Temperature"],
+               "@type": ["Property",
+                         "MultiLevelState",
+                         "http://iotschema.org/Temperature"],
                "inputData": {
                   "type": "object",
                   "fields": [
+                      // should also be units here...
                       {
                           "name": "value",
                           "value": {
@@ -150,12 +166,15 @@
        ]
    },
    "oic.r.button": {
-       "@type": ["http://iotschema.org/Sensor",
+       "@type": ["Switch",
+                 "http://iotschema.org/Sensor",
                  "http://iotschema.org/BinarySwitch"],
        "interaction": [
            {
                "name": "Switch Status",
-               "@type": ["Property","http://iotschema.org/SwitchStatus"],
+               "@type": ["Property",
+                         "OnOffState",
+                         "http://iotschema.org/SwitchStatus"],
                "inputData": {
                   "type": "object",
                   "fields": [
@@ -172,12 +191,15 @@
        ]
    },
    "oic.r.sensor.illuminance": {
-       "@type": ["http://iotschema.org/IlluminanceSensing",
+       "@type": ["Meter",
+                 "http://iotschema.org/IlluminanceSensing",
                  "http://iotschema.org/Sensor"],
        "interaction": [
            {
                "name": "Illuminance",
-               "@type": ["Property","http://iotschema.org/Illuminance"],
+               "@type": ["Property",
+                         "MultiLevelState",
+                         "http://iotschema.org/Illuminance"],
                "inputData": {
                   "type": "object",
                   "fields": [
@@ -200,7 +222,9 @@
        "interaction": [
            {
                "name": "Switch Status",
-               "@type": ["Property","http://iotschema.org/SwitchStatus"],
+               "@type": ["Property",
+                         "OnOffState",
+                         "http://iotschema.org/SwitchStatus"],
                "outputData": {
                   "type": "object",
                   "fields": [
@@ -216,7 +240,9 @@
            },
            {
                "name": "Turn On",
-               "@type": ["Action","http://iotschema.org/TurnOn"],
+               "@type": ["Action",
+                         "OnCommand",
+                         "http://iotschema.org/TurnOn"],
                "outputData": {
                   "type": "object",
                   "fields": [
@@ -233,7 +259,9 @@
            },
            {
                "name": "Turn Off",
-               "@type": ["Action","http://iotschema.org/TurnOff"],
+               "@type": ["Action",
+                         "OffCommand",
+                         "http://iotschema.org/TurnOff"],
                "outputData": {
                   "type": "object",
                   "fields": [
