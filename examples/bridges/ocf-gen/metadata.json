@@ -14,150 +14,238 @@
 // removed) 
 {
    "oic.r.led": {
-       "@type": ["iot:Light","iot:BinarySwitch"],
+       "@type": ["http://iotschema.org/LightControl",
+                 "http://iotschema.org/Actuator",
+                 "http://iotschema.org/BinarySwitch"],
        "interaction": [
            {
-               "name": "Switch State",
-               "@type": ["Property","iot:SwitchStatus"],
-               "outputdata": {
-                  "@type": ["iot:SwitchData"],
-                  "type": "boolean"
+               "name": "Switch Status",
+               "@type": ["Property","http://iotschema.org/SwitchStatus"],
+               "outputData": {
+                  "type": "object",
+                  "fields": [
+                      {
+                          "name": "value",
+                          "value": {
+                              "@type": ["http://iotschema.org/Toggle"],
+                              "type": "boolean"
+                          }
+                      }
+                  ]
                }
            },
            {
-               "name": "Switch On",
-               "@type": ["Action","iot:SwitchOn"],
-               "outputdata": {
-                  "@type": ["iot:SwitchData"],
-                  "type": "boolean",
-                  "value": true
+               "name": "Turn On",
+               "@type": ["Action","http://iotschema.org/TurnOn"],
+               "outputData": {
+                  "type": "object",
+                  "fields": [
+                      {
+                          "name": "value",
+                          "value": {
+                              "@type": ["http://iotschema.org/Toggle"],
+                              "type": "boolean",
+                              "value": true
+                          }
+                      }
+                  ]
                }
            },
            {
-               "name": "Switch Off",
-               "@type": ["Action","iot:SwitchOff"],
-               "outputdata": {
-                  "@type": ["iot:SwitchData"],
-                  "type": "boolean",
-                  "value": false
+               "name": "Turn Off",
+               "@type": ["Action","http://iotschema.org/TurnOff"],
+               "outputData": {
+                  "type": "object",
+                  "fields": [
+                      {
+                          "name": "value",
+                          "value": {
+                              "@type": ["http://iotschema.org/Toggle"],
+                              "type": "boolean",
+                              "value": false
+                          }
+                      }
+                  ]
                }
            }
        ]
    },
-/*
    "oic.r.colour.rgb": {
-       "@type": ["iot:Light","iot:BinarySwitch"],
+       "@type": ["http://iotschema.org/Light",
+                 "http://iotschema.org/Actuator"],
        "interaction": [
            {
-               "name": "Switch State",
-               "@type": ["Property","iot:SwitchStatus"],
-               "outputdata": {
-                  "@type": ["iot:SwitchData"],
-                  "type": "boolean"
-               }
-           },
-           {
-               "name": "Switch On",
-               "@type": ["Action","iot:SwitchOn"],
-               "outputdata": {
-                  "@type": ["iot:SwitchData"],
-                  "type": "boolean",
-                  "value": true
-               }
-           },
-           {
-               "name": "Switch Off",
-               "@type": ["Action","iot:SwitchOff"],
-               "outputdata": {
-                  "@type": ["iot:SwitchData"],
-                  "type": "boolean",
-                  "value": false
+               "name": "Light Colour",
+               "@type": ["Property","http://iotschema.org/CurrentColour"],
+               "outputData": {
+                   "type": "object",
+                   "fields": [
+                       {
+                          "name": "rgbValue",
+                          "value": {
+                              "type": "array",
+                              "items": [
+                                  {
+                                      "@type": ["http://iotschema.org/RColourData"],
+                                      "type": "number"
+                                  },
+                                  {
+                                      "@type": ["http://iotschema.org/GColourData"],
+                                      "type": "number"
+                                  },
+                                  {
+                                      "@type": ["http://iotschema.org/BColourData"],
+                                      "type": "number"
+                                  }
+                              ]
+                          }
+                      }
+                  ]
                }
            }
        ]
    },
-*/
    "oic.r.sensor.motion": {
-       "@type": ["iot:BinarySwitch"],
+       "@type": ["http://iotschema.org/MotionControl",
+                 "http://iotschema.org/Sensor"],
        "interaction": [
            {
-               "name": "Switch State",
-               "@type": ["Property","iot:SwitchStatus"],
-               "outputdata": {
-                  "@type": ["iot:SwitchData"],
-                  "type": "boolean"
+               "name": "Motion Detected",
+               "@type": ["Property","http://iotschema.org/MotionDetected"],
+               "inputData": {
+                   "type": "object",
+                   "fields": [
+                       {
+                           "name": "value",
+                           "value": {
+                               "@type": ["http://iotschema.org/StateData"],
+                               "type": "boolean"
+                           }
+                       }
+                   ]
                }
            }
        ]
    },
    "oic.r.temperature": {
-       "@type": ["iot:Temperature"],
+       "@type": ["http://iotschema.org/TemperatureSensing",
+                 "http://iotschema.org/Sensor"],
        "interaction": [
            {
                "name": "Temperature",
-               "@type": ["Property","iot:TemperatureStatus"],
-               "outputdata": {
-                  "@type": ["iot:TemperatureData"],
-                  "type": "number",
-                  "unit": "string"
+               "@type": ["Property","http://iotschema.org/Temperature"],
+               "inputData": {
+                  "type": "object",
+                  "fields": [
+                      {
+                          "name": "value",
+                          "value": {
+                              "@type": ["http://iotschema.org/TemperatureData"],
+                              "type": "number"
+                          }
+                      }
+                  ]
                }
            }
        ]
    },
    "oic.r.button": {
-       "@type": ["iot:BinarySwitch"],
+       "@type": ["http://iotschema.org/Sensor",
+                 "http://iotschema.org/BinarySwitch"],
        "interaction": [
            {
-               "name": "Switch State",
-               "@type": ["Property","iot:SwitchStatus"],
-               "outputdata": {
-                  "@type": ["iot:SwitchData"],
-                  "type": "boolean"
+               "name": "Switch Status",
+               "@type": ["Property","http://iotschema.org/SwitchStatus"],
+               "inputData": {
+                  "type": "object",
+                  "fields": [
+                      {
+                          "name": "value",
+                          "value": {
+                              "@type": ["http://iotschema.org/Toggle"],
+                              "type": "boolean"
+                          }
+                      }
+                  ]
                }
            }
        ]
    },
    "oic.r.sensor.illuminance": {
-       "@type": ["iot:Illuminance"],
+       "@type": ["http://iotschema.org/IlluminanceSensing",
+                 "http://iotschema.org/Sensor"],
        "interaction": [
            {
                "name": "Illuminance",
-               "@type": ["Property","iot:IlluminanceStatus"],
-               "outputdata": {
-                  "@type": ["iot:IlluminanceData"],
-                  "type": "number",
-                  "unit": "string"
+               "@type": ["Property","http://iotschema.org/Illuminance"],
+               "inputData": {
+                  "type": "object",
+                  "fields": [
+                      // should also be units here...
+                      {
+                          "name": "value",
+                          "value": {
+                              "@type": ["http://iotschema.org/IlluminanceData"],
+                              "type": "number"
+                          }
+                      }
+                  ]
                }
            }
        ]
    },
    "oic.r.buzzer": {
-       "@type": ["iot:BinarySwitch"],
+       "@type": ["http://iotschema.org/Actuator",
+                 "http://iotschema.org/BinarySwitch"],
        "interaction": [
            {
-               "name": "Switch State",
-               "@type": ["Property","iot:SwitchStatus"],
-               "outputdata": {
-                  "@type": ["iot:SwitchData"],
-                  "type": "boolean"
+               "name": "Switch Status",
+               "@type": ["Property","http://iotschema.org/SwitchStatus"],
+               "outputData": {
+                  "type": "object",
+                  "fields": [
+                      {
+                          "name": "value",
+                          "value": {
+                              "@type": ["http://iotschema.org/Toggle"],
+                              "type": "boolean"
+                          }
+                      }
+                  ]
                }
            },
            {
-               "name": "Switch On",
-               "@type": ["Action","iot:SwitchOn"],
-               "outputdata": {
-                  "@type": ["iot:SwitchData"],
-                  "type": "boolean",
-                  "value": true
+               "name": "Turn On",
+               "@type": ["Action","http://iotschema.org/TurnOn"],
+               "outputData": {
+                  "type": "object",
+                  "fields": [
+                      {
+                          "name": "value",
+                          "value": {
+                              "@type": ["http://iotschema.org/Toggle"],
+                              "type": "boolean",
+                              "value": true
+                          }
+                      }
+                  ]
                }
            },
            {
-               "name": "Switch Off",
-               "@type": ["Action","iot:SwitchOff"],
-               "outputdata": {
-                  "@type": ["iot:SwitchData"],
-                  "type": "boolean",
-                  "value": false
+               "name": "Turn Off",
+               "@type": ["Action","http://iotschema.org/TurnOff"],
+               "outputData": {
+                  "type": "object",
+                  "fields": [
+                      {
+                          "name": "value",
+                          "value": {
+                              "@type": ["http://iotschema.org/Toggle"],
+                              "type": "boolean",
+                              "value": false
+                          }
+                      }
+                  ]
                }
            }
        ]

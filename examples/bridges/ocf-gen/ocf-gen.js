@@ -28,6 +28,7 @@ cmdr
 .option('-s, --scan-period <scan_period>','OCF resource scan period in ms')
 .option('-d, --desc-period <desc_period>','OCF descriptions scan period in ms')
 .option('-e, --extra-period <extra_period>','TD extra time-to-live')
+.option('-l, --local-hosts <local_hosts>','Use predefined localhost urls')
 .option('-o, --ocf-host <ocf-host>','OCF iot-rest-api-server base url')
 .option('-t, --td-host <td-host>','Thing Directory base url')
 .option('-m, --metadata <metadata path>','path to aux metdata file')
@@ -48,15 +49,30 @@ var extra_period = 5000;  // milliseconds
 if (cmdr.extraPeriod) extra_period = cmdr.extraPeriod;
 var td_period = scan_period + extra_period; // milliseconds
 
+// Whether to use local servers or gateway
+var local_hosts = false;
+if (cmdr.localHosts) local_hosts = cmdr.localHosts;
+
+// Get current host IP (Use for local links...)
+const ip = require("ip"); // not used yet
+var current_ip = ip.address();
+info_log("Current host IP: ",current_ip);
+
 // Where to find iot-rest-api-server
 //    a GET on <ocf_host>/api/oic/res
 //    should return OCF resources
-var ocf_host = "https://gateway.mmccool.net:8000";
+var ocf_host = (local_hosts ? 
+    "http://" + current_ip + ":8000":
+    "http://gateway.mmccool.net:8000"
+);
 if (cmdr.ocfHost) ocf_host = cmdr.ocfHost;
-const ocf_base = ocf_host + '/api';
+const ocf_base = ocf_host + '/api/';
 
 // Where to find thing-directory server
-var td_host = "https://gateway.mmccool.net:8090";
+var td_host = (local_hosts ? 
+    "http://" + current_ip + ":8090":
+    "http://gateway.mmccool.net:8090"
+);
 if (cmdr.tdHost) td_host = cmdr.tdHost;
 const td_base = td_host;
 
@@ -94,19 +110,13 @@ function concatMaps(A,B) {
   return C;
 }
 
-
-// Get current host IP (Use for local links...)
-const ip = require("ip"); // not used yet
-info_log("Current host IP: ",ip.address());
-
-
 // Get OCF device descriptions from OCF /oic/d interface
 // We do this asynchronously with the other request to (a) catch
 // descriptions that only show up once in a while (b) reduce the 
 // latency of the main metadata gathering process
 ocf_descs = []; // will be a map from di -> descriptions
 function scan_ocf_descs() {
-   const desc_url = ocf_base + '/oic/d';
+   const desc_url = ocf_base + 'oic/d';
    basic_log("OCF Description URL: ",desc_url);
    request(desc_url,function(error,response,desc_body) {
        if (error) throw ("OCF Gateway is not responding ("+error+")");
@@ -151,7 +161,7 @@ function get_ocf_metadata(
     ocf_host,     // base URL of OCF iot-rest-api-server
     done_callback // call when done
 ) {
-    const res_url = ocf_base + '/oic/res';
+    const res_url = ocf_base + 'oic/res';
     basic_log("OCF Resource URL: ",res_url);
 
     // Query OCF Resources through gateway running iot-rest-api-server
@@ -240,7 +250,8 @@ name_prefix = "Intel-OCF-";
 // Generate array of TDs (one per device ID)
 //  from normalized OCF metadata
 function generate_tds(ocf_metadata,done_callback) {
-    let prop_base = ocf_base + "/oic";
+    let use_prop_base = false;
+    let prop_base = ocf_base + "oic";
     let tds = [];
     let i = 0;
     // look at all key/value pairs
@@ -252,9 +263,11 @@ function generate_tds(ocf_metadata,done_callback) {
           let td = {
               "@context": [
                   "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
-                  "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
-	          {"iot": "http://iotschema.org/"}
+                  "http://w3c.github.io/wot/w3c-wot-common-context.jsonld"
+	          // ,{"iot": "http://iotschema.org/"}
+	          // ,{"test": "http://gateway.mmccool.net/test.jsonld"}
                ],
+               "base": (use_prop_base ? "" : prop_base),
                "@type": [ "Thing" ],
                "name": name_prefix + ocf_metadata[di].name,
                "interaction": []
@@ -285,7 +298,7 @@ function generate_tds(ocf_metadata,done_callback) {
                   "@type": [],
                   "link": [
                       {
-                          "href": prop_base + link.href
+                          "href": ((use_prop_base) ? prop_base : "") + link.href
                            + "?di=" + di,
                           "mediatype": "application/json"
                       }
