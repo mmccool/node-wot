@@ -80,8 +80,8 @@ function delete_TD(
             'Access-Control-Allow-Origin': '*'
         }
     };
-    const td_url = 'http://' + td_host + ':' + td_port + '/td';
-    debug_log("Removing TD via DELETE for " + td_key + " from Thing Directory at " + td_url);
+    const td_url = 'http://' + td_host + ':' + td_port + td_key;
+    console.log("Removing TD via DELETE for " + td_key + " from Thing Directory at " + td_url);
     var req = http.request(options,function(res) {
         debug_log('Status: ' + res.statusCode);
         debug_log('Headers: ' + JSON.stringify(res.headers));
@@ -97,6 +97,7 @@ function delete_TD(
         done_callback(err.message);
     });
     req.end();
+    done_callback(false);
 }
 
 // Look through TDs for names with the given prefix, make list of keys

@@ -266,6 +266,7 @@ function generate_tds(ocf_metadata,done_callback) {
                   "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
                   "http://w3c.github.io/wot/w3c-wot-common-context.jsonld"
 	          // ,{"iot": "http://iotschema.org/"}
+	          // ,{"http": "http://www.w3.org/2011/http/"}
 	          // ,{"test": "http://gateway.mmccool.net/test.jsonld"}
                ],
                "base": (use_prop_base ? "" : prop_base),
@@ -273,17 +274,14 @@ function generate_tds(ocf_metadata,done_callback) {
                "name": name_prefix + ocf_metadata[di].name,
                "interaction": []
           };
-          // convert OCF links to WoT interactions
+          // convert OCF resource links to WoT interactions
           let jj = 0;
           for (let j=0; j < links.length; j++) { 
               let link = links[j];
-              let href = link.href;
               let rt = link.rt;
               // Check if aux metadata exists
               let aux = undefined;
-              if (undefined !== link.rt) {
-                  aux = aux_metadata[link.rt];
-              }
+              if (link.rt) aux = aux_metadata[link.rt];
               // Figure out name for resource
               let name;
               if (aux) {
@@ -293,41 +291,123 @@ function generate_tds(ocf_metadata,done_callback) {
                   // otherwise use last segment of path
                   name = link.href.split("/")[-1];
               }
+              // Set up templates for link
+              const link_href = ((use_prop_base) ? prop_base : "") + link.href + "?di=" + di;
+              const link_template = {
+                  "get": {
+                      "href": link_href,
+                      "mediatype": "application/json",
+                      // "http:methodName": "http:get" 
+	              "http://www.w3.org/2011/http#methodName": "http://www.w3.org/2011/http#get" 
+                  },
+                  "post": {
+                      "href": link_href,
+                      "mediatype": "application/json",
+                      // "http:methodName": "http:post" 
+	              "http://www.w3.org/2011/http#methodName": "http://www.w3.org/2011/http#post" 
+                  },
+                  "put": {
+                      "href": link_href,
+                      "mediatype": "application/json",
+                      // "http:methodName": "http:put" 
+	              "http://www.w3.org/2011/http#methodName": "http://www.w3.org/2011/http#put" 
+                  }
+              };
               // Set up basic header for this interaction
               let interaction = {
                   "name": name,
                   "@type": [],
-                  "link": [
-                      {
-                          "href": ((use_prop_base) ? prop_base : "") + link.href
-                           + "?di=" + di,
-                          "mediatype": "application/json"
-                      }
-                  ]
+                  "link": []
               };
-              // Handle first "Property" interaction for each resource
-              if (aux) {
-                  // add inputdata protocol binding, if any
-                  if (aux.interaction[0].inputdata) {
-                      interaction.inputdata = aux.interaction[0].inputdata;
+              // Handle first interaction for each resource (typically a Property, but...)
+              if (aux && aux.interaction && aux.interaction.length > 0) {
+                  const link_type = aux.interaction[0]["@type"];
+                  if (!link_type) throw("no interaction type:" + link_type);
+                  // add inputData protocol binding, if any
+                  if (aux.interaction[0].inputData) {
+                      interaction.inputData = aux.interaction[0].inputData;
+                      const link_method = aux.interaction[0].inputMethod;
+                      if (!link_method) throw("link method missing");
+                      let link_form = Object.assign({},link_template[link_method]);
+                      if (!link_form) throw("unsupported link method :" + link_method);
+                      let link_rel = undefined;
+                      if (link_type.indexOf("Property") >= 0) link_rel = "setProperty";  
+                      if (link_type.indexOf("Action") >= 0) link_rel = "invokeAction"; 
+                      if (link_type.indexOf("Event") >= 0) link_rel = "setSubscription"; 
+                      if (!link_rel) throw("unsupported link type:" + link_type);
+                      link_form.rel = link_rel;
+                      interaction.link.push(link_form);
+                      debug_log("inputData link 0",json_pp(link_form));
                   }
-                  // add outputdata protocol binding, if any
-                  if (aux.interaction.outputdata) {
-                      interaction.outputdata = aux.interaction[0].outputdata;
+                  // add outputData protocol binding, if any
+                  if (aux.interaction[0].outputData) {
+                      interaction.outputData = aux.interaction[0].outputData;
+                      let link_method = aux.interaction[0].outputMethod;
+                      if (!link_method) throw("link method missing");
+                      let link_form = Object.assign({},link_template[link_method]);
+                      if (!link_form) throw("unsupported link method :" + link_method);
+                      let link_rel = undefined;
+                      if (link_type.indexOf("Property") >= 0) link_rel = "getProperty"; 
+                      if (link_type.indexOf("Action") >= 0) link_rel = "invokeAction"; 
+                      if (link_type.indexOf("Event") >= 0) link_rel = "getSubscription"; 
+                      if (!link_rel) throw("unsupported link type:" + link_type);
+                      link_form.rel = link_rel;
+                      interaction.link.push(link_form);
+                      debug_log("outputData link 0",json_pp(link_form));
                   }
                   // add extra semantic tags for interaction (if any)
                   interaction["@type"] = 
                       interaction["@type"].concat(aux.interaction[0]["@type"]);
-                  // add extra semantic tags for entire thing (if any)
+                  // add extra semantic tags for entire TD (if any)
                   td["@type"] = 
                       td["@type"].concat(aux["@type"]);
+              } else {
+                  throw("No aux metadata definitions for any interactions");
               }
-              // append WoT "Property" interaction for this OCF resource
-              td.interaction[jj++] = interaction;
+              // store first interaction for this OCF resource
+              td.interaction[jj] = interaction;
+              jj++;
               // append any additional interactions (eg Actions, Events)
               if (aux) {
                  for (let k=1; k < aux.interaction.length; k++) {
-                     td.interaction[jj++] = aux.interaction[k];
+                     td.interaction[jj] = {};
+                     td.interaction[jj]["name"] = aux.interaction[k]["name"];
+                     const link_type = aux.interaction[k]["@type"];
+                     if (!link_type) throw("no interaction type:" + link_type);
+                     td.interaction[jj]["@type"] = link_type;
+                     td.interaction[jj].link = [];
+                     if (aux.interaction[k].inputData) {
+                        td.interaction[jj].inputData = aux.interaction[k].inputData;
+                        const link_method = aux.interaction[k].inputMethod;
+                        if (!link_method) throw("link method missing");
+                        let link_form = Object.assign({},link_template[link_method]);
+                        if (!link_form) throw("unsupported link method :" + link_method);
+                        let link_rel = undefined;
+                        if (link_type.indexOf("Property") >= 0) link_rel = "setProperty"; 
+                        if (link_type.indexOf("Action") >= 0) link_rel = "invokeAction"; 
+                        if (link_type.indexOf("Event") >= 0) link_rel = "setSubscription"; 
+                        if (!link_rel) throw("unsupported link type:" + link_type);
+                        link_form.rel = link_rel;
+                        debug_log("inputData link ",jj,json_pp(link_form));
+                        td.interaction[jj].link.push(link_form);
+                     }
+                     if (aux.interaction[k].outputData) {
+                        td.interaction[jj].outputData = aux.interaction[k].outputData;
+                        const link_method = aux.interaction[k].outputMethod;
+                        if (!link_method) throw("link method missing");
+                        let link_form = Object.assign({},link_template[link_method]);
+                        if (!link_form) throw("unsupported link method :" + link_method);
+                        let link_rel = undefined;
+                        if (link_type.indexOf("Property") >= 0) link_rel = "getProperty"; 
+                        if (link_type.indexOf("Action") >= 0) link_rel = "invokeAction"; 
+                        if (link_type.indexOf("Event") >= 0) link_rel = "getSubscription"; 
+                        if (!link_rel) throw("unsupported link type:" + link_type);
+                        link_form.rel = link_rel;
+                        debug_log("outputData link ",jj,json_pp(link_form));
+                        td.interaction[jj].link.push(link_form);
+                     }
+                     jj++;
+                     debug_log("td interactions ",jj,json_pp(td.interaction));
                  }
               }
           }
