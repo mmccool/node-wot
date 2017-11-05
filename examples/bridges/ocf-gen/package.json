@@ -16,6 +16,7 @@
     "commander": "^2.11.0",
     "http": "0.0.0",
     "ip": "^1.1.5",
+    "persistent-cache": "^1.1.1",
     "request": "^2.81.0",
     "shush": "^1.0.0"
   }

@@ -36,16 +36,16 @@ cmdr
 .parse(process.argv);
 
 // How often to scan OCF metadata and update TDs. 
-var scan_period = 10*1000;  // milliseconds
+var scan_period = 30*1000;  // milliseconds
 if (cmdr.scanPeriod) scan_period = cmdr.scanPeriod;
 
 // How often to scan OCF descriptions and update description database
-var scan_descs_period = 60*1000;  // milliseconds
+var scan_descs_period = 120*1000;  // milliseconds
 if (cmdr.descPeriod) scan_descs_period = cmdr.descPeriod;
 
 // How long until TDs expire in Thing Directory.
 //   needs to be larger than scan_period, of course.
-var extra_period = 5000;  // milliseconds
+var extra_period = scan_descs_period + 5000;  // milliseconds
 if (cmdr.extraPeriod) extra_period = cmdr.extraPeriod;
 var td_period = scan_period + extra_period; // milliseconds
 
@@ -72,6 +72,7 @@ const ocf_base = ocf_host + '/api/';
 var td_host = (local_hosts ? 
     "http://" + current_ip + ":8090":
     "http://gateway.mmccool.net:8090"
+    // "http://plugfest.thingweb.io:8081"
 );
 if (cmdr.tdHost) td_host = cmdr.tdHost;
 const td_base = td_host;
@@ -352,12 +353,126 @@ function construct_TDs(ocf_host,done_callback) {
     );
 }
 
-// Scan TDs and update database.
-// TODO: this should also send updates to the Thing Directory
-let TDs = [];
+// var querystring = require('querystring');
+// var fs = require('fs');
+
+// Persistent cache to relate TDs to keys in Thing Directory
+var td_cache = require('persistent-cache')();
+
+// Update TD in the Thing Directory.
+function put_TD(td_key,td,done_callback) {
+    let td_string = JSON.stringify(td);
+    let options = {
+        host: 'plugfest.thingweb.io',
+        port: '8081',
+        //host: "localhost",
+        //port: '8090',
+        path: td_key,
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/ld+json',
+            'Content-Length': Buffer.byteLength(td_string),
+            'Access-Control-Allow-Origin': '*'
+        }
+    };
+    var td_url = "http://" + options.host + ":" + options.port + options.path;
+    debug_log("Updating TD via PUT for " + td.name + " to Thing Directory at " + td_url);
+    var req = http.request(options,function(res) {
+        debug_log('Status: ' + res.statusCode);
+        debug_log('Headers: ' + JSON.stringify(res.headers));
+        res.setEncoding('utf8');
+        res.on('data', function (body) {
+            console.log('Body: ' + body);
+        });
+
+        debug_log('Thing Directory PUT Response: ' + res.statusCode);
+        done_callback(200 !== res.statusCode);
+    });
+    req.on('error', function(err) {
+        debug_log('problem with PUT: ' + err.message);
+    });
+    req.write(td_string);
+    req.end();
+}
+
+// Record key for posted TD
+function record_TD_key(td_key,td_name,done_callback) {
+    debug_log("Caching key/name association: ",td_key," : ",td_name);
+    td_cache.put(td_name,td_key,done_callback);
+}
+
+// Post a new TD to the Thing Directory.
+function post_TD(td,done_callback) {
+    let td_string = JSON.stringify(td);
+    let options = {
+        host: 'plugfest.thingweb.io',
+        port: '8081',
+        // host: "localhost",
+        // port: '8090',
+        path: '/td',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/ld+json',
+            'Content-Length': Buffer.byteLength(td_string),
+            'Access-Control-Allow-Origin': '*'
+        }
+    };
+    var td_url = options.host + ':' + options.port + options.path;
+    debug_log("Creating new TD via POST for " + td.name + " to Thing Directory at " + td_url);
+    var req = http.request(options,function(res) {
+        debug_log('Status: ' + res.statusCode);
+        debug_log('Headers: ' + JSON.stringify(res.headers));
+        res.setEncoding('utf8');
+        res.on('data', function (body) {
+            console.log('Body: ' + body);
+        });
+
+        let td_name = td.name;
+        let td_key = res.headers['location'];
+        debug_log('Thing Directory POST Response: ' + res.statusCode,'; key = ' + td_key);
+        if (undefined !== td_key) {
+            record_TD_key(td_key,td_name,done_callback);
+        } else {
+            done_callback("POST failed");
+        }
+    });
+    req.write(td_string);
+    req.end();
+}
+
+// Either create or update TD depending on whether it already exists
+function update_TD(td,done_callback) {
+    td_cache.get(td.name,function(err,key) {
+         if (err) {
+             debug_log("Problem with reading cache");
+             done_callback(err);
+         } else {
+             if (undefined === key) {
+                 // Does not exist, create new entry
+                 post_TD(td,done_callback);
+             } else {
+                 // Exists, so update existing entry
+                 put_TD(key,td,done_callback);
+             }
+         }
+    });
+}
+
+let TDs = []; // initial state of local TD database
+
+// Scan TDs and update database (local, and also Thing Directory)
 function scan_TDs() {
     construct_TDs(ocf_host,
         function(tds) {
+          for (let i=0; i < tds.length; i++) {
+              update_TD(tds[i],function(err) {
+                  if (err) {
+                      debug_log("Error updating TD ",tds[i].name);
+                  } else {
+                      debug_log("Finished updating TD ",tds[i].name);
+                  }
+              });
+          }
           TDs = tds;
           basic_log("Scan complete; TD database updated");
         }
