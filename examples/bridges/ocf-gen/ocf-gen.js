@@ -265,9 +265,9 @@ function generate_tds(ocf_metadata,done_callback) {
               "@context": [
                   "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
                   "http://w3c.github.io/wot/w3c-wot-common-context.jsonld"
-	          // ,{"iot": "http://iotschema.org/"}
-	          // ,{"http": "http://www.w3.org/2011/http/"}
-	          // ,{"test": "http://gateway.mmccool.net/test.jsonld"}
+	          ,{"iot": "http://iotschema.org/"}
+	          ,{"http": "http://www.w3.org/2011/http/"}
+	          //,{"test": "http://gateway.mmccool.net/test.jsonld"}
                ],
                "base": (use_prop_base ? "" : prop_base),
                "@type": [ "Thing" ],
@@ -297,20 +297,17 @@ function generate_tds(ocf_metadata,done_callback) {
                   "get": {
                       "href": link_href,
                       "mediatype": "application/json",
-                      // "http:methodName": "http:get" 
-	              "http://www.w3.org/2011/http#methodName": "http://www.w3.org/2011/http#get" 
+                      "http:methodName": "http:get" 
                   },
                   "post": {
                       "href": link_href,
                       "mediatype": "application/json",
-                      // "http:methodName": "http:post" 
-	              "http://www.w3.org/2011/http#methodName": "http://www.w3.org/2011/http#post" 
+                      "http:methodName": "http:post" 
                   },
                   "put": {
                       "href": link_href,
                       "mediatype": "application/json",
-                      // "http:methodName": "http:put" 
-	              "http://www.w3.org/2011/http#methodName": "http://www.w3.org/2011/http#put" 
+                      "http:methodName": "http:put" 
                   }
               };
               // Set up basic header for this interaction

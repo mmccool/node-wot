@@ -15,15 +15,15 @@
 {
    "oic.r.led": {
        "@type": ["Light",
-                 "http://iotschema.org/LightControl",
-                 "http://iotschema.org/Actuator",
-                 "http://iotschema.org/BinarySwitch"],
+                 "iot:LightControl",
+                 "iot:Actuator",
+                 "iot:BinarySwitch"],
        "interaction": [
            {
                "name": "Switch Status",
                "@type": ["Property",
                          "OnOffState",
-                         "http://iotschema.org/SwitchStatus"],
+                         "iot:SwitchStatus"],
                "outputMethod": "get",
                "outputData": {
                   "type": "object",
@@ -31,7 +31,7 @@
                       {
                           "name": "value",
                           "value": {
-                              "@type": ["http://iotschema.org/Toggle"],
+                              "@type": ["iot:Toggle"],
                               "type": "boolean"
                           }
                       }
@@ -44,7 +44,7 @@
                       {
                           "name": "value",
                           "value": {
-                              "@type": ["http://iotschema.org/Toggle"],
+                              "@type": ["iot:Toggle"],
                               "type": "boolean"
                           }
                       }
@@ -55,7 +55,7 @@
                "name": "Turn On",
                "@type": ["Action",
                          "OnCommand",
-                         "http://iotschema.org/TurnOn"],
+                         "iot:TurnOn"],
                "inputMethod": "post",
                "inputData": {
                   "type": "object",
@@ -63,7 +63,7 @@
                       {
                           "name": "value",
                           "value": {
-                              "@type": ["http://iotschema.org/Toggle"],
+                              "@type": ["iot:Toggle"],
                               "type": "boolean",
                               "value": true
                           }
@@ -75,7 +75,7 @@
                "name": "Turn Off",
                "@type": ["Action",
                          "OffCommand",
-                         "http://iotschema.org/TurnOff"],
+                         "iot:TurnOff"],
                "inputMethod": "post",
                "inputData": {
                   "type": "object",
@@ -83,7 +83,7 @@
                       {
                           "name": "value",
                           "value": {
-                              "@type": ["http://iotschema.org/Toggle"],
+                              "@type": ["iot:Toggle"],
                               "type": "boolean",
                               "value": false
                           }
@@ -95,13 +95,13 @@
    },
    "oic.r.colour.rgb": {
        "@type": ["Light",
-                 "http://iotschema.org/Light",
-                 "http://iotschema.org/Actuator"],
+                 "iot:Light",
+                 "iot:Actuator"],
        "interaction": [
            {
                "name": "Light Colour",
                "@type": ["Property",
-                         "http://iotschema.org/CurrentColour"],
+                         "iot:CurrentColour"],
                "outputMethod": "get",
                "outputData": {
                    "type": "object",
@@ -112,15 +112,15 @@
                               "type": "array",
                               "items": [
                                   {
-                                      "@type": ["http://iotschema.org/RColourData"],
+                                      "@type": ["iot:RColourData"],
                                       "type": "number"
                                   },
                                   {
-                                      "@type": ["http://iotschema.org/GColourData"],
+                                      "@type": ["iot:GColourData"],
                                       "type": "number"
                                   },
                                   {
-                                      "@type": ["http://iotschema.org/BColourData"],
+                                      "@type": ["iot:BColourData"],
                                       "type": "number"
                                   }
                               ]
@@ -138,15 +138,15 @@
                               "type": "array",
                               "items": [
                                   {
-                                      "@type": ["http://iotschema.org/RColourData"],
+                                      "@type": ["iot:RColourData"],
                                       "type": "number"
                                   },
                                   {
-                                      "@type": ["http://iotschema.org/GColourData"],
+                                      "@type": ["iot:GColourData"],
                                       "type": "number"
                                   },
                                   {
-                                      "@type": ["http://iotschema.org/BColourData"],
+                                      "@type": ["iot:BColourData"],
                                       "type": "number"
                                   }
                               ]
@@ -159,14 +159,14 @@
    },
    "oic.r.sensor.motion": {
        "@type": ["Motion",
-                 "http://iotschema.org/MotionControl",
-                 "http://iotschema.org/Sensor"],
+                 "iot:MotionControl",
+                 "iot:Sensor"],
        "interaction": [
            {
                "name": "Motion Detected",
                "@type": ["Property",
                          "Occupancy",
-                         "http://iotschema.org/MotionDetected"],
+                         "iot:MotionDetected"],
                "outputMethod": "get",
                "outputData": {
                    "type": "object",
@@ -174,7 +174,7 @@
                        {
                            "name": "value",
                            "value": {
-                               "@type": ["http://iotschema.org/StateData"],
+                               "@type": ["iot:StateData"],
                                "type": "boolean"
                            }
                        }
@@ -185,14 +185,14 @@
    },
    "oic.r.temperature": {
        "@type": ["Temperature",
-                 "http://iotschema.org/TemperatureSensing",
-                 "http://iotschema.org/Sensor"],
+                 "iot:TemperatureSensing",
+                 "iot:Sensor"],
        "interaction": [
            {
                "name": "Temperature",
                "@type": ["Property",
                          "MultiLevelState",
-                         "http://iotschema.org/Temperature"],
+                         "iot:Temperature"],
                "outputMethod": "get",
                "outputData": {
                   "type": "object",
@@ -201,7 +201,7 @@
                       {
                           "name": "value",
                           "value": {
-                              "@type": ["http://iotschema.org/TemperatureData"],
+                              "@type": ["iot:TemperatureData"],
                               "type": "number"
                           }
                       }
@@ -212,14 +212,14 @@
    },
    "oic.r.button": {
        "@type": ["Switch",
-                 "http://iotschema.org/Sensor",
-                 "http://iotschema.org/BinarySwitch"],
+                 "iot:Sensor",
+                 "iot:BinarySwitch"],
        "interaction": [
            {
                "name": "Switch Status",
                "@type": ["Property",
                          "OnOffState",
-                         "http://iotschema.org/SwitchStatus"],
+                         "iot:SwitchStatus"],
                "outputMethod": "get",
                "outputData": {
                   "type": "object",
@@ -227,7 +227,7 @@
                       {
                           "name": "value",
                           "value": {
-                              "@type": ["http://iotschema.org/Toggle"],
+                              "@type": ["iot:Toggle"],
                               "type": "boolean"
                           }
                       }
@@ -238,14 +238,14 @@
    },
    "oic.r.sensor.illuminance": {
        "@type": ["Meter",
-                 "http://iotschema.org/IlluminanceSensing",
-                 "http://iotschema.org/Sensor"],
+                 "iot:IlluminanceSensing",
+                 "iot:Sensor"],
        "interaction": [
            {
                "name": "Illuminance",
                "@type": ["Property",
                          "MultiLevelState",
-                         "http://iotschema.org/Illuminance"],
+                         "iot:Illuminance"],
                "outputMethod": "get",
                "outputData": {
                   "type": "object",
@@ -254,7 +254,7 @@
                       {
                           "name": "value",
                           "value": {
-                              "@type": ["http://iotschema.org/IlluminanceData"],
+                              "@type": ["iot:IlluminanceData"],
                               "type": "number"
                           }
                       }
@@ -264,14 +264,14 @@
        ]
    },
    "oic.r.buzzer": {
-       "@type": ["http://iotschema.org/Actuator",
-                 "http://iotschema.org/BinarySwitch"],
+       "@type": ["iot:Actuator",
+                 "iot:BinarySwitch"],
        "interaction": [
            {
                "name": "Switch Status",
                "@type": ["Property",
                          "OnOffState",
-                         "http://iotschema.org/SwitchStatus"],
+                         "iot:SwitchStatus"],
                "outputMethod": "get",
                "outputData": {
                   "type": "object",
@@ -279,7 +279,7 @@
                       {
                           "name": "value",
                           "value": {
-                              "@type": ["http://iotschema.org/Toggle"],
+                              "@type": ["iot:Toggle"],
                               "type": "boolean"
                           }
                       }
@@ -292,7 +292,7 @@
                       {
                           "name": "value",
                           "value": {
-                              "@type": ["http://iotschema.org/Toggle"],
+                              "@type": ["iot:Toggle"],
                               "type": "boolean"
                           }
                       }
@@ -303,7 +303,7 @@
                "name": "Turn On",
                "@type": ["Action",
                          "OnCommand",
-                         "http://iotschema.org/TurnOn"],
+                         "iot:TurnOn"],
                "inputMethod": "post",
                "inputData": {
                   "type": "object",
@@ -311,7 +311,7 @@
                       {
                           "name": "value",
                           "value": {
-                              "@type": ["http://iotschema.org/Toggle"],
+                              "@type": ["iot:Toggle"],
                               "type": "boolean",
                               "value": true
                           }
@@ -323,7 +323,7 @@
                "name": "Turn Off",
                "@type": ["Action",
                          "OffCommand",
-                         "http://iotschema.org/TurnOff"],
+                         "iot:TurnOff"],
                "inputMethod": "post",
                "inputData": {
                   "type": "object",
@@ -331,7 +331,7 @@
                       {
                           "name": "value",
                           "value": {
-                              "@type": ["http://iotschema.org/Toggle"],
+                              "@type": ["iot:Toggle"],
                               "type": "boolean",
                               "value": false
                           }
