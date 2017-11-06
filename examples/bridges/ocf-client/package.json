@@ -1,0 +1,15 @@
+{
+  "name": "ocf-client",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Test OCF TDs",
+  "main": "ocf-client.js",
+  "author": "Michael McCool (michael.mccool@intel.com)",
+  "license": "NONE - Not Yet Licensed for External Use",
+  "scripts": {
+    "start": "node ocf-client.js"
+  },
+  "dependencies": {
+    "request": "^2.83.0"
+  }
+}
