@@ -272,7 +272,7 @@ function generate_tds(ocf_metadata,done_callback) {
                "base": (use_prop_base ? "" : prop_base),
                "@type": [ "Thing" ],
                "name": name_prefix + ocf_metadata[di].name,
-               "@id": "urn:uuid:" + ocf_metadata[di].name, // TODO: make this a real uuid 
+               "@id": "urn:uuid:" + di, 
                "interaction": []
           };
           // convert OCF resource links to WoT interactions

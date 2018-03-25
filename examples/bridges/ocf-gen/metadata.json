@@ -20,7 +20,7 @@
                  "iot:BinarySwitch"],
        "interaction": [
            {
-               "name": "Switch Status",
+               "name": "status",
                "@type": ["Property",
                          "OnOffState",
                          "iot:SwitchStatus"],
@@ -38,7 +38,7 @@
                }
            },
            {
-               "name": "Turn On",
+               "name": "on",
                "@type": ["Action",
                          "OnCommand",
                          "iot:TurnOn"],
@@ -57,7 +57,7 @@
                }
            },
            {
-               "name": "Turn Off",
+               "name": "off",
                "@type": ["Action",
                          "OffCommand",
                          "iot:TurnOff"],
@@ -83,7 +83,7 @@
                  "iot:Actuator"],
        "interaction": [
            {
-               "name": "Light Colour",
+               "name": "colour",
                "@type": ["Property",
                          "iot:CurrentColour"],
                "schema": {
@@ -120,7 +120,7 @@
                  "iot:Sensor"],
        "interaction": [
            {
-               "name": "Motion Detected",
+               "name": "motion",
                "@type": ["Property",
                          "Occupancy",
                          "iot:MotionDetected"],
@@ -145,7 +145,7 @@
                  "iot:Sensor"],
        "interaction": [
            {
-               "name": "Temperature",
+               "name": "temperature",
                "@type": ["Property",
                          "MultiLevelState",
                          "iot:Temperature"],
@@ -170,7 +170,7 @@
                  "iot:BinarySwitch"],
        "interaction": [
            {
-               "name": "Switch Status",
+               "name": "status",
                "@type": ["Property",
                          "OnOffState",
                          "iot:SwitchStatus"],
@@ -195,7 +195,7 @@
                  "iot:Sensor"],
        "interaction": [
            {
-               "name": "Illuminance",
+               "name": "illuminance",
                "@type": ["Property",
                          "MultiLevelState",
                          "iot:Illuminance"],
@@ -219,7 +219,7 @@
                  "iot:BinarySwitch"],
        "interaction": [
            {
-               "name": "Switch Status",
+               "name": "status",
                "@type": ["Property",
                          "OnOffState",
                          "iot:SwitchStatus"],
@@ -237,7 +237,7 @@
                }
            },
            {
-               "name": "Turn On",
+               "name": "on",
                "@type": ["Action",
                          "OnCommand",
                          "iot:TurnOn"],
@@ -256,7 +256,7 @@
                }
            },
            {
-               "name": "Turn Off",
+               "name": "off",
                "@type": ["Action",
                          "OffCommand",
                          "iot:TurnOff"],
