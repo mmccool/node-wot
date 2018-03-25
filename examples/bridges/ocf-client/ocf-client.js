@@ -1,4 +1,5 @@
 "use strict"
+// const WoT = require('wot');
 
 // Helper function to pretty-print JSON
 var util = require("util");
@@ -20,7 +21,7 @@ function get_eps(callback) {
 function toggle_lights(eps) {
   for (let i=0; i < eps.length; i++) {
       let base = "http://plugfest.thingweb.io:8081/td-lookup/ep?ep=";
-      WoT.consumeDescriptionUri(base + eps[i]).then(thing => {
+      WoT.consume(base + eps[i]).then(thing => {
          // Get current status
          thing.getProperty("Switch Status").then( state => {
              console.log("LED State: " + state);

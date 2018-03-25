@@ -264,14 +264,15 @@ function generate_tds(ocf_metadata,done_callback) {
           let td = {
               "@context": [
                   "http://w3c.github.io/wot/w3c-wot-td-context.jsonld",
-                  "http://w3c.github.io/wot/w3c-wot-common-context.jsonld"
-	          ,{"iot": "http://iotschema.org/"}
-	          ,{"http": "http://www.w3.org/2011/http/"}
+                  "http://w3c.github.io/wot/w3c-wot-common-context.jsonld",
+	          {"iot": "http://iotschema.org/",
+	           "http": "http://www.w3.org/2011/http/"}
 	          //,{"test": "http://gateway.mmccool.net/test.jsonld"}
                ],
                "base": (use_prop_base ? "" : prop_base),
                "@type": [ "Thing" ],
                "name": name_prefix + ocf_metadata[di].name,
+               "@id": "urn:uuid:" + ocf_metadata[di].name, // TODO: make this a real uuid 
                "interaction": []
           };
           // convert OCF resource links to WoT interactions
@@ -291,66 +292,91 @@ function generate_tds(ocf_metadata,done_callback) {
                   // otherwise use last segment of path
                   name = link.href.split("/")[-1];
               }
-              // Set up templates for link
-              const link_href = ((use_prop_base) ? prop_base : "") + link.href + "?di=" + di;
-              const link_template = {
-                  "get": {
-                      "href": link_href,
-                      "mediatype": "application/json",
-                      "http:methodName": "http:get" 
-                  },
-                  "post": {
-                      "href": link_href,
-                      "mediatype": "application/json",
-                      "http:methodName": "http:post" 
-                  },
-                  "put": {
-                      "href": link_href,
-                      "mediatype": "application/json",
-                      "http:methodName": "http:put" 
-                  }
+              // Set up templates for form
+              const form_href = ((use_prop_base) ? prop_base : "") + link.href + "?di=" + di;
+              const form_template = {
+                  "Property": [
+                      {
+                          "href": form_href,
+                          "mediaType": "application/json",
+                          "http:methodName": "GET",
+                          "rel": ["readProperty"],
+                      },
+                      {
+                          "href": form_href,
+                          "mediaType": "application/json",
+                          "http:methodName": "POST",
+                          "rel": ["writeProperty"],
+                      }
+                  ],
+                  "Action": [
+                      {
+                          "href": form_href,
+                          "mediaType": "application/json",
+                          "http:methodName": "POST",
+                          "rel": ["invokeAction"]
+                      }
+                  ],
+                  "Event": [
+                      {
+                          "href": form_href,
+                          "mediaType": "application/json",
+                          "http:methodName": "PUT",
+                          "rel": ["subscribeEvent"]
+                      },
+                      {
+                          "href": form_href,
+                          "mediaType": "application/json",
+                          "http:methodName": "DELETE",
+                          "rel": ["unsubscribeEvent"]
+                      }
+                  ]
               };
               // Set up basic header for this interaction
               let interaction = {
                   "name": name,
                   "@type": [],
-                  "link": []
+                  "form": []
               };
               // Handle first interaction for each resource (typically a Property, but...)
+              var schema;
               if (aux && aux.interaction && aux.interaction.length > 0) {
                   const link_type = aux.interaction[0]["@type"];
                   if (!link_type) throw("no interaction type:" + link_type);
-                  // add inputData protocol binding, if any
-                  if (aux.interaction[0].inputData) {
-                      interaction.inputData = aux.interaction[0].inputData;
-                      const link_method = aux.interaction[0].inputMethod;
-                      if (!link_method) throw("link method missing");
-                      let link_form = Object.assign({},link_template[link_method]);
-                      if (!link_form) throw("unsupported link method :" + link_method);
-                      let link_rel = undefined;
-                      if (link_type.indexOf("Property") >= 0) link_rel = "setProperty";  
-                      if (link_type.indexOf("Action") >= 0) link_rel = "invokeAction"; 
-                      if (link_type.indexOf("Event") >= 0) link_rel = "setSubscription"; 
-                      if (!link_rel) throw("unsupported link type:" + link_type);
-                      link_form.rel = link_rel;
-                      interaction.link.push(link_form);
-                      debug_log("inputData link 0",json_pp(link_form));
+                  // add inputSchema protocol binding, if any
+                  schema = undefined;
+                  if (aux.interaction[0].inputSchema) schema = aux.interaction[0].inputSchema; 
+                  if (aux.interaction[0].schema) schema = aux.interaction[0].schema; 
+                  if (schema) {
+                      let form_key;
+                      const form_type = aux.interaction[0]["@type"];
+                      if (form_type.indexOf("Property") >= 0) form_key = "Property";
+                      if (form_type.indexOf("Action") >= 0) form_key = "Action"; 
+                      if (form_type.indexOf("Event") >= 0) form_key = "Event"; 
+                      if (!form_key) throw("unsupported type:" + form_type);
+                      let form;
+                      // form = Object.assign({},form_template[form_key]);
+                      form = form_template[form_key];
+                      if (form_key === "Action") {
+                          interaction.inputSchema = schema;
+                      } else {
+                          interaction.schema = schema;
+                      }
+                      interaction.form.push(form);
+                      debug_log("inputSchema 0",json_pp(form));
                   }
                   // add outputData protocol binding, if any
-                  if (aux.interaction[0].outputData) {
-                      interaction.outputData = aux.interaction[0].outputData;
-                      let link_method = aux.interaction[0].outputMethod;
-                      if (!link_method) throw("link method missing");
-                      let link_form = Object.assign({},link_template[link_method]);
-                      if (!link_form) throw("unsupported link method :" + link_method);
-                      let link_rel = undefined;
-                      if (link_type.indexOf("Property") >= 0) link_rel = "getProperty"; 
-                      if (link_type.indexOf("Action") >= 0) link_rel = "invokeAction"; 
-                      if (link_type.indexOf("Event") >= 0) link_rel = "getSubscription"; 
-                      if (!link_rel) throw("unsupported link type:" + link_type);
-                      link_form.rel = link_rel;
-                      interaction.link.push(link_form);
-                      debug_log("outputData link 0",json_pp(link_form));
+                  if (aux.interaction[0].outputSchema) {
+                      const form_type = aux.interaction[0]["@type"];
+                      let form_key;
+                      if (form_type.indexOf("Action") >= 0) form_key = "Action"; 
+                      if (!form_key) throw("unsupported type:" + form_type);
+                      let form;
+                      // form = Object.assign({},form_template[form_key]);
+                      form = form_template[form_key];
+                      interaction.outputSchema = aux.interaction[0].outputSchema;
+                      interaction.form.push(form);
+                      debug_log("outputSchema 0",json_pp(form));
                   }
                   // add extra semantic tags for interaction (if any)
                   interaction["@type"] = 
@@ -364,44 +390,44 @@ function generate_tds(ocf_metadata,done_callback) {
               // store first interaction for this OCF resource
               td.interaction[jj] = interaction;
               jj++;
-              // append any additional interactions (eg Actions, Events)
+              // append any additional interactions 
               if (aux) {
                  for (let k=1; k < aux.interaction.length; k++) {
                      td.interaction[jj] = {};
                      td.interaction[jj]["name"] = aux.interaction[k]["name"];
-                     const link_type = aux.interaction[k]["@type"];
-                     if (!link_type) throw("no interaction type:" + link_type);
-                     td.interaction[jj]["@type"] = link_type;
-                     td.interaction[jj].link = [];
-                     if (aux.interaction[k].inputData) {
-                        td.interaction[jj].inputData = aux.interaction[k].inputData;
-                        const link_method = aux.interaction[k].inputMethod;
-                        if (!link_method) throw("link method missing");
-                        let link_form = Object.assign({},link_template[link_method]);
-                        if (!link_form) throw("unsupported link method :" + link_method);
-                        let link_rel = undefined;
-                        if (link_type.indexOf("Property") >= 0) link_rel = "setProperty"; 
-                        if (link_type.indexOf("Action") >= 0) link_rel = "invokeAction"; 
-                        if (link_type.indexOf("Event") >= 0) link_rel = "setSubscription"; 
-                        if (!link_rel) throw("unsupported link type:" + link_type);
-                        link_form.rel = link_rel;
-                        debug_log("inputData link ",jj,json_pp(link_form));
-                        td.interaction[jj].link.push(link_form);
+                     const form_type = aux.interaction[k]["@type"];
+                     if (!form_type) throw("no interaction type:" + form_type);
+                     td.interaction[jj]["@type"] = form_type;
+                     td.interaction[jj].form = [];
+                     schema = undefined;
+                     if (aux.interaction[0].inputSchema) schema = aux.interaction[0].inputSchema; 
+                     if (aux.interaction[0].schema) schema = aux.interaction[0].schema; 
+                     if (schema) {
+                        const form_type = aux.interaction[0]["@type"];
+                        if (form_type.indexOf("Property") >= 0) form_key = "Property";
+                        if (form_type.indexOf("Action") >= 0) form_key = "Action"; 
+                        if (form_type.indexOf("Event") >= 0) form_key = "Event"; 
+                        if (!form_key) throw("unsupported type:" + form_type);
+                        let form;
+                        // form = Object.assign({},form_template[form_key]);
+                        form = form_template[form_key];
+                        if (form_key === "Action") {
+                            td.interaction[jj].inputSchema = schema;
+                        } else {
+                            td.interaction[jj].schema = schema;
+                        }
+                        td.interaction[jj].form.push(form);
                      }
-                     if (aux.interaction[k].outputData) {
-                        td.interaction[jj].outputData = aux.interaction[k].outputData;
-                        const link_method = aux.interaction[k].outputMethod;
-                        if (!link_method) throw("link method missing");
-                        let link_form = Object.assign({},link_template[link_method]);
-                        if (!link_form) throw("unsupported link method :" + link_method);
-                        let link_rel = undefined;
-                        if (link_type.indexOf("Property") >= 0) link_rel = "getProperty"; 
-                        if (link_type.indexOf("Action") >= 0) link_rel = "invokeAction"; 
-                        if (link_type.indexOf("Event") >= 0) link_rel = "getSubscription"; 
-                        if (!link_rel) throw("unsupported link type:" + link_type);
-                        link_form.rel = link_rel;
-                        debug_log("outputData link ",jj,json_pp(link_form));
-                        td.interaction[jj].link.push(link_form);
+                     if (aux.interaction[k].outputSchema) {
+                        td.interaction[jj].outputSchema = aux.interaction[k].outputSchema;
+                        const form_type = aux.interaction[k]["@type"];
+                        if (form_type.indexOf("Action") >= 0) form_key = "Action"; 
+                        if (!form_rel) throw("unsupported type:" + form_type);
+                        let form;
+                        // form = Object.assign({},form_template[form_key]);
+                        form = form_template[form_key];
+                        interaction.outputSchema[jj] = aux.interaction[k].outputSchema;
+                        td.interaction[jj].form.push(form);
                      }
                      jj++;
                      debug_log("td interactions ",jj,json_pp(td.interaction));

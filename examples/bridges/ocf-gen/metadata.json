@@ -24,27 +24,13 @@
                "@type": ["Property",
                          "OnOffState",
                          "iot:SwitchStatus"],
-               "outputMethod": "get",
-               "outputData": {
+               "schema": {
                   "type": "object",
-                  "fields": [
+                  "field": [
                       {
                           "name": "value",
-                          "value": {
-                              "@type": ["iot:Toggle"],
-                              "type": "boolean"
-                          }
-                      }
-                  ]
-               },
-               "inputMethod": "post",
-               "inputData": {
-                  "type": "object",
-                  "fields": [
-                      {
-                          "name": "value",
-                          "value": {
-                              "@type": ["iot:Toggle"],
+                          "@type": ["iot:Toggle"],
+                          "schema": {
                               "type": "boolean"
                           }
                       }
@@ -56,16 +42,15 @@
                "@type": ["Action",
                          "OnCommand",
                          "iot:TurnOn"],
-               "inputMethod": "post",
-               "inputData": {
+               "inputSchema": {
                   "type": "object",
-                  "fields": [
+                  "field": [
                       {
                           "name": "value",
-                          "value": {
-                              "@type": ["iot:Toggle"],
+                          "@type": ["iot:Toggle"],
+                          "schema": {
                               "type": "boolean",
-                              "value": true
+                              "value": "true"
                           }
                       }
                   ]
@@ -76,16 +61,15 @@
                "@type": ["Action",
                          "OffCommand",
                          "iot:TurnOff"],
-               "inputMethod": "post",
-               "inputData": {
+               "inputSchema": {
                   "type": "object",
-                  "fields": [
+                  "field": [
                       {
                           "name": "value",
-                          "value": {
-                              "@type": ["iot:Toggle"],
+                          "@type": ["iot:Toggle"],
+                          "schema": {
                               "type": "boolean",
-                              "value": false
+                              "value": "false"
                           }
                       }
                   ]
@@ -102,39 +86,12 @@
                "name": "Light Colour",
                "@type": ["Property",
                          "iot:CurrentColour"],
-               "outputMethod": "get",
-               "outputData": {
+               "schema": {
                    "type": "object",
-                   "fields": [
+                   "field": [
                        {
                           "name": "rgbValue",
-                          "value": {
-                              "type": "array",
-                              "items": [
-                                  {
-                                      "@type": ["iot:RColourData"],
-                                      "type": "number"
-                                  },
-                                  {
-                                      "@type": ["iot:GColourData"],
-                                      "type": "number"
-                                  },
-                                  {
-                                      "@type": ["iot:BColourData"],
-                                      "type": "number"
-                                  }
-                              ]
-                          }
-                      }
-                  ]
-               },
-               "inputMethod": "post",
-               "inputData": {
-                   "type": "object",
-                   "fields": [
-                       {
-                          "name": "rgbValue",
-                          "value": {
+                          "schema": {
                               "type": "array",
                               "items": [
                                   {
@@ -167,14 +124,13 @@
                "@type": ["Property",
                          "Occupancy",
                          "iot:MotionDetected"],
-               "outputMethod": "get",
-               "outputData": {
+               "schema": {
                    "type": "object",
-                   "fields": [
+                   "field": [
                        {
                            "name": "value",
-                           "value": {
-                               "@type": ["iot:StateData"],
+                           "@type": ["iot:StateData"],
+                           "schema": {
                                "type": "boolean"
                            }
                        }
@@ -193,15 +149,13 @@
                "@type": ["Property",
                          "MultiLevelState",
                          "iot:Temperature"],
-               "outputMethod": "get",
-               "outputData": {
+               "schema": {
                   "type": "object",
-                  "fields": [
-                      // should also be units here...
+                  "field": [
                       {
                           "name": "value",
-                          "value": {
-                              "@type": ["iot:TemperatureData"],
+                          "@type": ["iot:TemperatureData"],
+                          "schema": {
                               "type": "number"
                           }
                       }
@@ -220,14 +174,13 @@
                "@type": ["Property",
                          "OnOffState",
                          "iot:SwitchStatus"],
-               "outputMethod": "get",
-               "outputData": {
+               "schema": {
                   "type": "object",
-                  "fields": [
+                  "field": [
                       {
                           "name": "value",
-                          "value": {
-                              "@type": ["iot:Toggle"],
+                          "@type": ["iot:Toggle"],
+                          "schema": {
                               "type": "boolean"
                           }
                       }
@@ -246,15 +199,13 @@
                "@type": ["Property",
                          "MultiLevelState",
                          "iot:Illuminance"],
-               "outputMethod": "get",
-               "outputData": {
+               "schema": {
                   "type": "object",
-                  "fields": [
-                      // should also be units here...
+                  "field": [
                       {
                           "name": "value",
-                          "value": {
-                              "@type": ["iot:IlluminanceData"],
+                          "@type": ["iot:IlluminanceData"],
+                          "schema": {
                               "type": "number"
                           }
                       }
@@ -272,27 +223,13 @@
                "@type": ["Property",
                          "OnOffState",
                          "iot:SwitchStatus"],
-               "outputMethod": "get",
-               "outputData": {
+               "schema": {
                   "type": "object",
-                  "fields": [
+                  "field": [
                       {
                           "name": "value",
-                          "value": {
-                              "@type": ["iot:Toggle"],
-                              "type": "boolean"
-                          }
-                      }
-                  ]
-               },
-               "inputMethod": "post",
-               "inputData": {
-                  "type": "object",
-                  "fields": [
-                      {
-                          "name": "value",
-                          "value": {
-                              "@type": ["iot:Toggle"],
+                          "@type": ["iot:Toggle"],
+                          "schema": {
                               "type": "boolean"
                           }
                       }
@@ -304,14 +241,13 @@
                "@type": ["Action",
                          "OnCommand",
                          "iot:TurnOn"],
-               "inputMethod": "post",
-               "inputData": {
+               "inputSchema": {
                   "type": "object",
-                  "fields": [
+                  "field": [
                       {
                           "name": "value",
-                          "value": {
-                              "@type": ["iot:Toggle"],
+                          "@type": ["iot:Toggle"],
+                          "schema": {
                               "type": "boolean",
                               "value": true
                           }
@@ -324,14 +260,13 @@
                "@type": ["Action",
                          "OffCommand",
                          "iot:TurnOff"],
-               "inputMethod": "post",
-               "inputData": {
+               "inputSchema": {
                   "type": "object",
-                  "fields": [
+                  "field": [
                       {
                           "name": "value",
-                          "value": {
-                              "@type": ["iot:Toggle"],
+                          "@type": ["iot:Toggle"],
+                          "schema": {
                               "type": "boolean",
                               "value": false
                           }
