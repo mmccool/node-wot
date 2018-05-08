@@ -1,21 +1,17 @@
-/*
- * W3C Software License
- *
- * Copyright (c) 2018 the thingweb community
- *
- * THIS WORK IS PROVIDED "AS IS," AND COPYRIGHT HOLDERS MAKE NO REPRESENTATIONS OR
- * WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO, WARRANTIES OF
- * MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE
- * SOFTWARE OR DOCUMENT WILL NOT INFRINGE ANY THIRD PARTY PATENTS, COPYRIGHTS,
- * TRADEMARKS OR OTHER RIGHTS.
- *
- * COPYRIGHT HOLDERS WILL NOT BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
- * CONSEQUENTIAL DAMAGES ARISING OUT OF ANY USE OF THE SOFTWARE OR DOCUMENT.
- *
- * The name and trademarks of copyright holders may NOT be used in advertising or
- * publicity pertaining to the work without specific, written prior permission. Title
- * to copyright in this work will at all times remain with copyright holders.
- */
+/********************************************************************************
+ * Copyright (c) 2018 Contributors to the Eclipse Foundation
+ * 
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ * 
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v. 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the W3C Software Notice and
+ * Document License (2015-05-13) which is available at
+ * https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document.
+ * 
+ * SPDX-License-Identifier: EPL-2.0 OR W3C-20150513
+ ********************************************************************************/
 
 /**
  * Basic test suite to demonstrate test setup
@@ -107,6 +103,45 @@ class WoTServerTest {
         expect(thing).to.have.property("interaction");
     }
 
+    @test async "should be able to add a property with default value 0"() {
+        let thing: WoT.ExposedThing = WoTServerTest.WoT.produce({ name: "otherthing100" });
+        let initp: WoT.ThingProperty = {
+            name: "number",
+            writable: true,
+            schema: `{ "type": "number" }`,
+            value: 0
+        };
+        thing.addProperty(initp);
+        let value1 = await thing.readProperty("number");
+        expect(value1).to.equal(0);
+    }
+
+
+    @test async "should be able to add a property with default value XYZ"() {
+        let thing: WoT.ExposedThing = WoTServerTest.WoT.produce({ name: "otherthing101" });
+        let initp: WoT.ThingProperty = {
+            name: "string",
+            writable: true,
+            schema: `{ "type": "string" }`,
+            value: "XYZ"
+        };
+        thing.addProperty(initp);
+        let value1 = await thing.readProperty("string");
+        expect(value1).to.equal("XYZ");
+    }
+
+    @test async "should be able to add a property without any default value"() {
+        let thing: WoT.ExposedThing = WoTServerTest.WoT.produce({ name: "otherthing102" });
+        let initp: WoT.ThingProperty = {
+            name: "number",
+            writable: true,
+            schema: `{ "type": "number" }`
+        };
+        thing.addProperty(initp);
+        let value1 = await thing.readProperty("number");
+        expect(value1).to.equal(null);
+    }
+
     @test async "should be able to add a property, read it and write it locally"() {
         let thing: WoT.ExposedThing = WoTServerTest.WoT.produce({ name: "otherthing" });
         let initp: WoT.ThingProperty = {
@@ -116,15 +151,154 @@ class WoTServerTest {
             value: 10
         };
         thing.addProperty(initp);
-        let value1 = await thing.readProperty("number");
-        expect(value1).to.equal(10);
+        let value0 = await thing.readProperty("number");
+        expect(value0).to.equal(10);
         await thing.writeProperty("number", 5);
-        let value2 = await thing.readProperty("number");
-        expect(value2).to.equal(5);
+        let value1 = await thing.readProperty("number");
+        expect(value1).to.equal(5);
     }
 
-    // FIXME What listeners?!
-    @test.skip "should be able to add a property, assign it via listener and read it locally"() {
+
+    @test async "should be able to add a property, read it by setting read increment handler (with lambda)"() {
+        let thing: WoT.ExposedThing = WoTServerTest.WoT.produce({ name: "otherthingIncRead" });
+        let initp: WoT.ThingProperty = {
+            name: "number",
+            writable: true,
+            schema: `{ "type": "number" }`
+        };
+        let counter: number = 0;
+        thing.addProperty(initp).setPropertyReadHandler(
+            initp.name,
+            () => {
+                return new Promise((resolve, reject) => {
+                    resolve(++counter);
+                });
+            }
+        );
+
+        expect(await thing.readProperty("number")).to.equal(1);
+        expect(await thing.readProperty("number")).to.equal(2);
+        expect(await thing.readProperty("number")).to.equal(3);
+    }
+
+    @test async "should be able to add a property, read it by setting read increment handler (with function)"() {
+        let thing: WoT.ExposedThing = WoTServerTest.WoT.produce({ name: "otherthingIncRead2" });
+        let initp: WoT.ThingProperty = {
+            name: "number",
+            writable: true,
+            schema: `{ "type": "number" }`
+        };
+        let counter: number = 0;
+        thing.addProperty(initp).setPropertyReadHandler(
+            initp.name,
+            function () {
+                return new Promise((resolve, reject) => {
+                    resolve(++counter);
+                });
+            }
+        );
+
+        expect(await thing.readProperty("number")).to.equal(1);
+        expect(await thing.readProperty("number")).to.equal(2);
+        expect(await thing.readProperty("number")).to.equal(3);
+    }
+
+
+    @test async "should be able to add a property, read it by setting read increment handler (with local counter state)"() {
+        let thing: WoT.ExposedThing = WoTServerTest.WoT.produce({ name: "otherthingIncRead3" });
+        let initp: WoT.ThingProperty = {
+            name: "number",
+            writable: true,
+            schema: `{ "type": "number" }`
+        };
+        thing.addProperty(initp).setPropertyReadHandler(
+            initp.name,
+            function () {
+                return new Promise((resolve, reject) => {
+                    // TODO: figure out a way to provide a common scope that can be used for consecutive handler calls
+                    // let counter: number = 0; // fails to keep state!!
+                    // var counter: number = 0; // fails to keep state also!!
+                    // resolve(++counter);
+                    if (!this.counter) {
+                        // init counter the first time
+                        this.counter = 0;
+                    }
+                    resolve(++this.counter);
+                });
+            }
+        );
+
+        expect(await thing.readProperty("number")).to.equal(1);
+        expect(await thing.readProperty("number")).to.equal(2);
+        expect(await thing.readProperty("number")).to.equal(3);
+    }
+
+    @test async "should be able to add a property, read it by setting write handler double"() {
+        let thing: WoT.ExposedThing = WoTServerTest.WoT.produce({ name: "otherthingWrite" });
+        let initp: WoT.ThingProperty = {
+            name: "number",
+            writable: true,
+            schema: `{ "type": "number" }`
+        };
+        thing.addProperty(initp);
+        let initp2: WoT.ThingProperty = {
+            name: "number2",
+            writable: true,
+            schema: `{ "type": "number" }`
+        };
+        thing.addProperty(initp2);
+        thing.setPropertyWriteHandler(
+            initp.name,
+            (value: any) => {
+                return new Promise((resolve, reject) => {
+                    thing.writeProperty(initp2.name, value * 2);
+                    resolve(value);
+                });
+            }
+        );
+
+        await thing.writeProperty("number", 12);
+        expect(await thing.readProperty("number")).to.equal(12);
+        expect(await thing.readProperty("number2")).to.equal(24);
+
+        await thing.writeProperty("number", 13)
+        expect(await thing.readProperty("number")).to.equal(13);
+        expect(await thing.readProperty("number2")).to.equal(26);
+    }
+
+    @test async "should be able to add a property, read it by setting write handler with reading old value"() {
+        let thing: WoT.ExposedThing = WoTServerTest.WoT.produce({ name: "otherthingReadWrite" });
+        let initp: WoT.ThingProperty = {
+            name: "number",
+            writable: true,
+            schema: `{ "type": "number" }`,
+            value: 2
+        };
+        thing.addProperty(initp);
+        // set handler that writes newValue as oldValue+request
+        thing.setPropertyWriteHandler(
+            initp.name,
+            (value: any) => {
+                return new Promise((resolve, reject) => {
+                    thing.readProperty(initp.name).then(
+                        (oldValue) => {
+                            resolve(oldValue + value);
+                        }
+                    );
+                });
+            }
+        );
+
+        // Note: writePropety uses side-effect (sets new value plus old value)
+        // Defintely not a good idea to do so (for testing purposes only!)
+        await thing.writeProperty("number", 1);  // 2 + 1 = 3
+        expect(await thing.readProperty("number")).to.equal(3);
+
+        await thing.writeProperty("number", 2); // 3 + 2 = 5
+        expect(await thing.readProperty("number")).to.equal(5);
+    }
+
+    @test async "should be able to add a property, write and read it locally"() {
         let thing: WoT.ExposedThing = WoTServerTest.WoT.produce({ name: "thing3" });
         let initp: WoT.ThingProperty = {
             name: "prop1",
@@ -134,60 +308,8 @@ class WoTServerTest {
         };
         thing.addProperty(initp);
 
-        let listener = WoTServerTest.server.getListenerFor("/thing3/properties/prop1");
-        expect(listener).to.exist;
-        listener.should.be.an.instanceOf(listeners.PropertyResourceListener);
-        return listener.onWrite({ mediaType: undefined, body: new Buffer("5") }).then(() => {
-            return thing.readProperty("prop1").then((value) => expect(value).to.equal(5));
-        });
-    }
-
-    // FIXME What listeners?!
-    @test.skip "should be able to add a property, assign it locally and read it via listener"() {
-        let thing: WoT.ExposedThing = WoTServerTest.WoT.produce({ name: "thing4" });
-        let initp: WoT.ThingProperty = {
-            name: "prop1",
-            writable: true,
-            schema: `{ "type": "number" }`,
-            value: 10
-        };
-        thing.addProperty(initp);
-
-        let listener = WoTServerTest.server.getListenerFor("/thing4/properties/prop1");
-        expect(listener).to.exist;
-        listener.should.be.an.instanceOf(listeners.PropertyResourceListener);
-
-        return thing.writeProperty("prop1", 23).then((value) => {
-            return listener.onRead().then((content) => {
-                content.should.deep.equal({ mediaType: "application/json", body: new Buffer("23") });
-            });
-        });
-    }
-
-    // FIXME What listeners?!
-    @test.skip "should be able to add a property, assign and read it via listener"() {
-        let thing: WoT.ExposedThing = WoTServerTest.WoT.produce({
-            name: "thing5"
-        });
-        let initp: WoT.ThingProperty = {
-            name: "prop1",
-            writable: true,
-            schema: `{ "type": "number" }`,
-            value: 10
-        };
-        thing.addProperty(initp);
-
-        let listener = WoTServerTest.server.getListenerFor("/thing5/properties/prop1");
-        expect(listener).to.exist;
-        listener.should.be.an.instanceOf(listeners.PropertyResourceListener);
-        return listener.onWrite({ mediaType: undefined, body: new Buffer("42") }).then(() => {
-            return thing.readProperty("prop1").then((value) => {
-                value.should.equal(42);
-                return listener.onRead().then((content) => {
-                    content.body.should.deep.equal(new Buffer("42"));
-                });
-            });
-        });
+        await thing.writeProperty("prop1", 5);
+        expect(await thing.readProperty("prop1")).to.equal(5);
     }
 
     @test "should be able to add an action and invoke it locally"() {
@@ -213,10 +335,9 @@ class WoTServerTest {
         return thing.invokeAction("action1", 23).then((result) => result.should.equal(42));
     }
 
-    // FIXME ThingTemplate does not process given Interactions yet
-    @test.skip "should be able to add an action and invoke it locally (based on WoT.ThingTemplate)"() {
+    @test "should be able to add an action and invoke it locally (based on WoT.ThingTemplate)"() {
         let thing: WoT.ExposedThing = WoTServerTest.WoT.produce({
-            name: "thing6b"
+            name: "thing6c"
         });
         let inita: WoT.ThingAction = {
             name: "action1",
@@ -266,37 +387,5 @@ class WoTServerTest {
         );
 
         return thing.invokeAction("action1", 23).then((result) => result.should.equal(42));
-    }
-
-    // FIXME What listeners?!
-    @test.skip "should be able to add an action and invoke it via listener"() {
-        let thing: WoT.ExposedThing = WoTServerTest.WoT.produce({
-            name: "thing7"
-        });
-        let inita: WoT.ThingAction = {
-            name: "action1",
-            inputSchema: `{ "type": "number" }`,
-            outputSchema: `{ "type": "number" }`
-        };
-        thing.addAction(inita).setActionHandler(
-            inita.name,
-            (parameters: any) => {
-                return new Promise((resolve, reject) => {
-                    parameters.should.be.a("number");
-                    parameters.should.equal(23);
-                    resolve(42);
-                });
-            }
-        );
-
-        let listener = WoTServerTest.server.getListenerFor("/thing7/actions/action1");
-        expect(listener).to.exist;
-        listener.should.be.an.instanceOf(listeners.ActionResourceListener);
-
-        return listener
-            .onInvoke({ mediaType: undefined, body: new Buffer("23") })
-            .then((resBytes => {
-                resBytes.should.deep.equal({ mediaType: "application/json", body: new Buffer("42") });
-            }));
     }
 }
