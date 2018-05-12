@@ -178,10 +178,13 @@ function get_ocf_metadata(
       } catch(e) {
           throw("Could not parse response from OCF Gateway as JSON ("+e+")");
       }
-      if (!Array.isArray(resources)) throw "Array expected";
+      //if (!Array.isArray(resources)) throw "Array expected";
 
       // initial database is empty
       let ocf_metadata = []; // map from unique dis -> array of resources
+      if (!Array.isArray(resources)) {
+         done_callback(ocf_metadata);
+      }
 
       // scan through all resources listed
       for (let resource of resources) {
